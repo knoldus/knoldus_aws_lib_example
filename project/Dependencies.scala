@@ -13,6 +13,7 @@ object Dependencies {
     val TypeSafeConfigVersion = "1.4.2"
     val PureConfigVersion = "0.17.2"
     val AwsJavaSDKVersion = "1.11.490"
+    val AkkaVersion = "2.7.0"
     val AkkaHttpVersion = "10.4.0"
     val AkkaHttpCorsVersion = "1.1.3"
 
@@ -34,6 +35,8 @@ object Dependencies {
     val PlayJson = "com.typesafe.play" %% "play-json" % PlayJsonVersion
     val PureConfig = "com.github.pureconfig" %% "pureconfig" % PureConfigVersion
     val ScalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % ScalaLoggingVersion
+    val AkkaActor = "com.typesafe.akka" %% "akka-actor" % AkkaVersion
+    val AkkaStream = "com.typesafe.akka" %% "akka-stream" % AkkaVersion
     val AkkaHttp = "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
     val AkkaHttpCors =  "ch.megard" %% "akka-http-cors" % AkkaHttpCorsVersion
     val AkkaHttpTestKit = "com.typesafe.akka" % "akka-http-testkit_2.13" % AkkaHttpVersion
@@ -46,6 +49,8 @@ object Dependencies {
       ScalaLogging,
       PlayJson,
       PureConfig,
+      AkkaActor,
+      AkkaStream,
       AkkaHttp,
       AkkaHttpCors,
       AkkaHttpTestKit
