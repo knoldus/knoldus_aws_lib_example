@@ -1,7 +1,7 @@
 package com.knoldus.dynamodb.domain
 
 import com.knoldus.dynamodb.models.DynamoItem
-import play.api.libs.json.{Format, JsSuccess, JsValue, Json}
+import play.api.libs.json.{ Format, JsSuccess, JsValue, Json }
 
 import java.time.Instant
 

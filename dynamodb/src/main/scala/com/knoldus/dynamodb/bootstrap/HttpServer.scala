@@ -8,14 +8,14 @@ import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import com.typesafe.config.Config
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 
 class HttpServer(httpConfig: Config)(implicit
-                                     system: ActorSystem,
-                                     executionContext: ExecutionContext,
-                                     materializer: Materializer,
-                                     logger: LoggingAdapter
+  system: ActorSystem,
+  executionContext: ExecutionContext,
+  materializer: Materializer,
+  logger: LoggingAdapter
 ) {
 
   def start(routes: Route): Future[Http.ServerBinding] = {
