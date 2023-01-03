@@ -5,7 +5,7 @@ import akka.actor.CoordinatedShutdown.Reason
 import akka.actor.{ ActorSystem, CoordinatedShutdown }
 import akka.http.scaladsl.Http
 import akka.stream.Materializer
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.ExecutionContext.global
@@ -14,7 +14,7 @@ import scala.concurrent.{ Await, ExecutionContextExecutor, Future }
 import scala.util.{ Failure, Success }
 
 object DriverApp extends App with LazyLogging {
-  lazy val conf: Config = ConfigFactory.load()
+  lazy val conf = ConfigFactory.load()
   implicit val actorSystem: ActorSystem = ActorSystem("knoldus-aws-lib-example-system", conf)
   implicit val materializer: Materializer = Materializer(actorSystem)
   implicit val executionContext: ExecutionContextExecutor = global
@@ -22,7 +22,6 @@ object DriverApp extends App with LazyLogging {
 
   try {
     val httpServerConfig = conf.getConfig("http")
-
     val services = new ServiceInstantiator(conf)
     val httpServer = new HttpServer(httpServerConfig)(
       system = actorSystem,
