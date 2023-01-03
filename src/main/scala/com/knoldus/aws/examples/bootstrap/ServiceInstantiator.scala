@@ -8,13 +8,11 @@ import com.typesafe.config.Config
 import scala.concurrent.ExecutionContext
 
 class ServiceInstantiator(
- conf: Config
- )(implicit actorSystem: ActorSystem
-) {
+  conf: Config
+)(implicit actorSystem: ActorSystem) {
   implicit val ec: ExecutionContext = actorSystem.dispatcher
-
   private val tableName = conf.getString("dynamodb.table.name")
   val questionTable: QuestionTable = QuestionTable(tableName)
-  lazy val questionService = new QuestionServiceImpl(questionTable)
 
+  lazy val questionService = new QuestionServiceImpl(questionTable)
 }

@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.Directives._
 import com.knoldus.aws.examples.services.QuestionService
 
 class QuestionAPIImpl(questionService: QuestionService) extends QuestionAPI {
-  val questionAPIRoutes: Route = submitQuestion ~ getQuestion ~ updateQuestion() ~ deleteQuestion()
+  val routes: Route = submitQuestion ~ getQuestion ~ updateQuestion() ~ deleteQuestion()
 
   override def submitQuestion: Route = ???
 
