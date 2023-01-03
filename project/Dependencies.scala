@@ -48,7 +48,11 @@ object Dependencies {
       PureConfig,
       AkkaHttp,
       AkkaHttpCors,
-      AkkaHttpTestKit
+      AkkaHttpTestKit,
+      Dynamo,
+      Kinesis,
+      s3,
+      sqs
     )
   }
 
