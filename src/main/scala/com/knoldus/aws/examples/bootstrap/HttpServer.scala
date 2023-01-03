@@ -7,6 +7,7 @@ import akka.http.scaladsl.server.Directives.pathPrefix
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import com.typesafe.config.Config
+import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
@@ -14,9 +15,8 @@ import scala.util.{ Failure, Success }
 class HttpServer(httpConfig: Config)(implicit
   system: ActorSystem,
   executionContext: ExecutionContext,
-  materializer: Materializer,
-  logger: LoggingAdapter
-) {
+  materializer: Materializer
+) extends LazyLogging {
 
   def start(routes: Route): Future[Http.ServerBinding] = {
     val interface = httpConfig.getString("interface")
@@ -31,7 +31,7 @@ class HttpServer(httpConfig: Config)(implicit
       case Success(_) =>
         logger.info("Has bound server on {}:{}.", interface, port)
       case Failure(ex) =>
-        logger.error(ex, "Has failed to bind to {}:{}!", interface, port)
+        logger.error("Has failed to bind to {}:{}!", interface, port)
     }
     serverBinding
   }
