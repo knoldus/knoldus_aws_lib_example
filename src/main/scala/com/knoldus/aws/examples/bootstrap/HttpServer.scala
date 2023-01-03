@@ -1,7 +1,6 @@
 package com.knoldus.aws.examples.bootstrap
 
 import akka.actor.ActorSystem
-import akka.event.LoggingAdapter
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.pathPrefix
 import akka.http.scaladsl.server.Route
@@ -9,8 +8,8 @@ import akka.stream.Materializer
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.LazyLogging
 
-import scala.concurrent.{ ExecutionContext, Future }
-import scala.util.{ Failure, Success }
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 class HttpServer(httpConfig: Config)(implicit
   system: ActorSystem,
@@ -31,7 +30,7 @@ class HttpServer(httpConfig: Config)(implicit
       case Success(_) =>
         logger.info("Has bound server on {}:{}.", interface, port)
       case Failure(ex) =>
-        logger.error("Has failed to bind to {}:{}!", interface, port)
+        logger.error(s"Has failed to bind to {}:{}, reason: $ex", interface, port)
     }
     serverBinding
   }
