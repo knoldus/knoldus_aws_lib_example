@@ -1,4 +1,4 @@
-package com.knoldus.dynamodb.routes
+package com.knoldus.aws.examples.routes
 
 import akka.http.scaladsl.server.Route
 

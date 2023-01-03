@@ -1,8 +1,8 @@
-package com.knoldus.dynamodb.routes
+package com.knoldus.aws.examples.routes
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import com.knoldus.dynamodb.service.QuestionService
+import com.knoldus.aws.examples.service.QuestionService
 
 class QuestionAPIImpl(questionService: QuestionService) extends QuestionAPI {
   val questionAPIRoutes: Route = submitQuestion ~ getQuestion ~ updateQuestion() ~ deleteQuestion()

@@ -1,4 +1,4 @@
-package com.knoldus.dynamodb.domain
+package com.knoldus.aws.examples.domain
 
 import com.knoldus.dynamodb.models.DynamoItem
 import play.api.libs.json.{ Format, JsSuccess, JsValue, Json }

@@ -1,6 +1,6 @@
-package com.knoldus.dynamodb.service
+package com.knoldus.aws.examples.service
 
-import com.knoldus.dynamodb.domain.{ Question, QuestionUpdate }
+import com.knoldus.aws.examples.domain.{ Question, QuestionUpdate }
 import scala.concurrent.Future
 
 trait QuestionService {

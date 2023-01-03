@@ -1,6 +1,6 @@
-package com.knoldus.dynamodb.service
+package com.knoldus.aws.examples.service
 
-import com.knoldus.dynamodb.domain.{ Question, QuestionTable, QuestionUpdate }
+import com.knoldus.aws.examples.domain.{ Question, QuestionTable, QuestionUpdate }
 import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json.Json
 

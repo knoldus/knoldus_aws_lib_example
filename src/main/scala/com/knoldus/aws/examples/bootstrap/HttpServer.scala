@@ -1,4 +1,4 @@
-package com.knoldus.dynamodb.bootstrap
+package com.knoldus.aws.examples.bootstrap
 
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
