@@ -1,4 +1,4 @@
-package com.knoldus.aws.examples.service
+package com.knoldus.aws.examples.services
 
 import com.knoldus.aws.examples.models.{ Question, QuestionTable, QuestionUpdate }
 import com.typesafe.scalalogging.LazyLogging
