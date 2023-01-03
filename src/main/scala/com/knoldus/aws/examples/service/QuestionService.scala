@@ -1,6 +1,6 @@
 package com.knoldus.aws.examples.service
 
-import com.knoldus.aws.examples.domain.{ Question, QuestionUpdate }
+import com.knoldus.aws.examples.models.{ Question, QuestionUpdate }
 import scala.concurrent.Future
 
 trait QuestionService {
