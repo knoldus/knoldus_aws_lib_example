@@ -1,6 +1,8 @@
 import Dependencies._
 import sbt.Test
 
+Compile / mainClass := Some("com.knoldus.aws.examples.bootstrap.DriverApp")
+
 lazy val KnoldusAwsLibSamples = Project("knoldus-aws-lib-examples", file("."))
   .settings(
     name := "knoldus-aws-lib-examples",

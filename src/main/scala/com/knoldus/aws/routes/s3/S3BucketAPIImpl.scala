@@ -1,10 +1,12 @@
-package com.knoldus.s3.routes
+package com.knoldus.aws.routes.s3
+
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.knoldus.s3.service.S3BucketService
+import com.knoldus.aws.services.s3.S3BucketService
 
 class S3BucketAPIImpl(s3BucketService: S3BucketService) extends S3BucketAPI {
 
-  //val S3BucketAPIRoutes: Route = createS3Bucket ~ listS3Bucket ~ listAllBuckets ~ deleteS3Bucket()
+  val S3BucketAPIRoutes: Route = createS3Bucket ~ listS3Bucket ~ listAllBuckets ~ deleteS3Bucket()
 
   override def createS3Bucket: Route = ???
 

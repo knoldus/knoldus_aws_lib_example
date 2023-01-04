@@ -1,4 +1,4 @@
-package com.knoldus.s3.routes
+package com.knoldus.aws.routes.s3
 
 import akka.http.scaladsl.server.Route
 

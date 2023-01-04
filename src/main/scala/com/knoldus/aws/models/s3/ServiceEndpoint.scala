@@ -1,3 +1,3 @@
-package com.knoldus.s3.models
+package com.knoldus.aws.models.s3
 
 case class ServiceEndpoint(endpoint: String)
