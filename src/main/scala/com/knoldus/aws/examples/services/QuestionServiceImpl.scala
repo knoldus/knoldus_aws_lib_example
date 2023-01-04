@@ -48,9 +48,8 @@ class QuestionServiceImpl(questionTable: QuestionTable) extends QuestionService 
       }
       logger.info(s"Updating the question with id: $id and category: $category")
       questionTable.update(category, id, updateQuestionEntity().record) match {
-        case Right(id) =>
-          logger.info("Question updated successfully")
-          Some(id)
+        case Right(_) =>
+          Some("Question updated successfully")
         case Left(message) =>
           logger.error(s"Failed to update the question: $message")
           None

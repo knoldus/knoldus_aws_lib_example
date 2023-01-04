@@ -15,6 +15,7 @@ object Dependencies {
     val AkkaVersion = "2.7.0"
     val AkkaHttpVersion = "10.4.0"
     val AkkaHttpCorsVersion = "1.1.3"
+    val LogbackVersion = "1.2.9"
 
     // Example Specific
     val DynamoDbVersion = "1.0"
@@ -36,12 +37,14 @@ object Dependencies {
     val AkkaActor = "com.typesafe.akka" %% "akka-actor" % AkkaVersion
     val AkkaStream = "com.typesafe.akka" %% "akka-stream" % AkkaVersion
     val AkkaHttp = "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
+    val AkkaHttpSpray = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion
     val AkkaHttpCors =  "ch.megard" %% "akka-http-cors" % AkkaHttpCorsVersion
     val AkkaHttpTestKit = "com.typesafe.akka" % "akka-http-testkit_2.13" % AkkaHttpVersion
     val Dynamo = "knoldus" % "dynamodb-service_2.13" % DynamoDbVersion
     val Kinesis = "knoldus" % "kinesis-service_2.13" % KinesisVersion
     val s3 = "knoldus" % "s3-service_2.13" % s3Version
     val sqs = "knoldus" % "sqs-service_2.13" % sqsVersion
+    val Logback = "ch.qos.logback" % "logback-classic" % LogbackVersion
 
     val All: Seq[ModuleID] = Seq(
       ScalaLogging,
@@ -49,12 +52,14 @@ object Dependencies {
       AkkaActor,
       AkkaStream,
       AkkaHttp,
+      AkkaHttpSpray,
       AkkaHttpCors,
       AkkaHttpTestKit,
       Dynamo,
       Kinesis,
       s3,
-      sqs
+      sqs,
+      Logback
     )
   }
 
