@@ -53,7 +53,11 @@ object Dependencies {
       AkkaStream,
       AkkaHttp,
       AkkaHttpCors,
-      AkkaHttpTestKit
+      AkkaHttpTestKit,
+      Dynamo,
+      Kinesis,
+      s3,
+      sqs
     )
   }
 
