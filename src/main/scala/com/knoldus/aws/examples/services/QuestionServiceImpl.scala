@@ -9,6 +9,8 @@ import scala.concurrent.Future
 
 class QuestionServiceImpl(questionTable: QuestionTable) extends QuestionService with LazyLogging {
 
+  private val noQuestionFoundResponse = """{"message": "Question not found", "statusCode": "404"}"""
+
   override def submitQuestion(question: Question): Future[Option[String]] =
     Future {
       questionTable.put(question.record) match {
@@ -35,7 +37,7 @@ class QuestionServiceImpl(questionTable: QuestionTable) extends QuestionService 
           }
         case None =>
           logger.info("Question not found")
-          None
+          throw new NoSuchElementException(noQuestionFoundResponse)
       }
     }
 
