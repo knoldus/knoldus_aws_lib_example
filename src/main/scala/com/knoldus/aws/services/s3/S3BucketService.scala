@@ -10,6 +10,6 @@ trait S3BucketService {
 
   def listAllBuckets: Option[List[Bucket]]
 
-  def listS3Bucket(name: String): Option[Bucket]
+  def searchS3Bucket(name: String): Option[Bucket]
 
 }

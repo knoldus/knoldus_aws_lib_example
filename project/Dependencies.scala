@@ -38,6 +38,7 @@ object Dependencies {
     val AkkaActor = "com.typesafe.akka" %% "akka-actor" % AkkaVersion
     val AkkaStream = "com.typesafe.akka" %% "akka-stream" % AkkaVersion
     val AkkaHttp = "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
+    val AkkaHttpSpray = "com.typesafe.akka" %% "akka-http-spray-json" % AkkaHttpVersion
     val AkkaHttpCors =  "ch.megard" %% "akka-http-cors" % AkkaHttpCorsVersion
     val AkkaHttpTestKit = "com.typesafe.akka" % "akka-http-testkit_2.13" % AkkaHttpVersion
     val Dynamo = "knoldus" % "dynamodb-service_2.13" % DynamoDbVersion
@@ -52,6 +53,7 @@ object Dependencies {
       AkkaActor,
       AkkaStream,
       AkkaHttp,
+      AkkaHttpSpray,
       AkkaHttpCors,
       AkkaHttpTestKit,
       Dynamo,

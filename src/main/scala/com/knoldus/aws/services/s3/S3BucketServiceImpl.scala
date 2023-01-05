@@ -17,8 +17,9 @@ class S3BucketServiceImpl extends S3BucketService with S3Service {
 
   implicit val s3Service: S3Service = S3Service
 
-  override def createS3Bucket(bucketName: String): Bucket =
+  override def createS3Bucket(bucketName: String): Bucket = {
     s3Service.getBucketByName(bucketName).getOrElse(s3Service.createBucket(bucketName, Some(config.awsConfig.region)))
+  }
 
   override def deleteS3Bucket(bucket: Bucket): Unit = {
     val summaries = bucket.objectSummaries().toList
@@ -31,6 +32,6 @@ class S3BucketServiceImpl extends S3BucketService with S3Service {
   override def listAllBuckets: Option[List[Bucket]] =
     Option(s3Service.getAllBuckets.toList)
 
-  override def listS3Bucket(name: String): Option[Bucket] =
+  override def searchS3Bucket(name: String): Option[Bucket] =
     s3Service.getBucketByName(name)
 }

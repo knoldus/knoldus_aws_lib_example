@@ -8,7 +8,7 @@ trait S3BucketAPI {
 
   def deleteS3Bucket(): Route
 
-  def listS3Bucket: Route
+  def searchS3Bucket: Route
 
   def listAllBuckets: Route
 
