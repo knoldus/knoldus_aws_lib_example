@@ -1,6 +1,7 @@
 package com.knoldus.aws.examples.services
 
 import com.knoldus.aws.examples.models.{ Question, QuestionTable, QuestionUpdate }
+import com.knoldus.aws.examples.utils.Constants
 import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json.Json
 
@@ -9,14 +10,12 @@ import scala.concurrent.Future
 
 class QuestionServiceImpl(questionTable: QuestionTable) extends QuestionService with LazyLogging {
 
-  private val noQuestionFoundResponse = """{"message": "Question not found", "statusCode": "404"}"""
-
   override def submitQuestion(question: Question): Future[Option[String]] =
     Future {
       questionTable.put(question.record) match {
         case Right(id) =>
           logger.info("Question submitted successfully")
-          Some(id)
+          Some(Constants.submitQuestionResponse(id))
         case Left(message) =>
           logger.error(s"Failed to submitted the question: $message")
           None
@@ -37,7 +36,7 @@ class QuestionServiceImpl(questionTable: QuestionTable) extends QuestionService 
           }
         case None =>
           logger.info("Question not found")
-          throw new NoSuchElementException(noQuestionFoundResponse)
+          throw new NoSuchElementException(Constants.noQuestionFoundResponse)
       }
     }
 
@@ -51,10 +50,10 @@ class QuestionServiceImpl(questionTable: QuestionTable) extends QuestionService 
       logger.info(s"Updating the question with id: $id and category: $category")
       questionTable.update(category, id, updateQuestionEntity().record) match {
         case Right(_) =>
-          Some("Question updated successfully")
+          Some(Constants.updateQuestionResponse)
         case Left(message) =>
           logger.error(s"Failed to update the question, reason: $message")
-          throw new NoSuchElementException(noQuestionFoundResponse)
+          throw new NoSuchElementException(Constants.noQuestionFoundResponse)
       }
     }
 

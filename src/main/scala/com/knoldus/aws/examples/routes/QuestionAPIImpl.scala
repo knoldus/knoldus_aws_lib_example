@@ -32,7 +32,7 @@ class QuestionAPIImpl(questionService: QuestionService) extends QuestionAPI with
       pathEnd {
         get {
           handleExceptions(noSuchElementExceptionHandler) {
-            logger.info(s"Making request for getting the question with category: $category and id: $questionId")
+            logger.info(s"Making request for getting the question with id: $questionId and category: $category")
             val response = questionService.getQuestion(questionId, category)
             complete(response)
           }
@@ -45,7 +45,7 @@ class QuestionAPIImpl(questionService: QuestionService) extends QuestionAPI with
       pathEnd {
         (put & entity(as[QuestionUpdate])) { questionUpdateRequest =>
           handleExceptions(noSuchElementExceptionHandler) {
-            logger.info("Making request to update the question")
+            logger.info(s"Making request to update a question")
             val response = questionService.updateQuestion(questionId, category, questionUpdateRequest)
             complete(response)
           }
@@ -53,5 +53,18 @@ class QuestionAPIImpl(questionService: QuestionService) extends QuestionAPI with
       }
     }
 
-  override def deleteQuestion(): Route = ???
+  override def deleteQuestion(): Route =
+    path("questions" / Segment / Segment) { (questionId, category) =>
+      pathEnd {
+        delete {
+          handleExceptions(noSuchElementExceptionHandler) {
+            logger.info(s"Making request for deleting a question")
+            val responseFuture = questionService.deleteQuestion(questionId, category)
+            onSuccess(responseFuture) {
+              complete(204, None)
+            }
+          }
+        }
+      }
+    }
 }
