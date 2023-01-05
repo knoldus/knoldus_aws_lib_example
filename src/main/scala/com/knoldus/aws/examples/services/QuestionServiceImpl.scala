@@ -53,8 +53,8 @@ class QuestionServiceImpl(questionTable: QuestionTable) extends QuestionService 
         case Right(_) =>
           Some("Question updated successfully")
         case Left(message) =>
-          logger.error(s"Failed to update the question: $message")
-          None
+          logger.error(s"Failed to update the question, reason: $message")
+          throw new NoSuchElementException(noQuestionFoundResponse)
       }
     }
 
