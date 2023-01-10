@@ -1,6 +1,6 @@
 package com.knoldus.aws.services.kinesis
 
-import com.knoldus.aws.models.kinesis.{BankAccountCreationRequest, BankAccountEvent}
+import com.knoldus.aws.models.kinesis.{ BankAccountCreationRequest, BankAccountEvent }
 
 import java.util.UUID
 import scala.concurrent.Future

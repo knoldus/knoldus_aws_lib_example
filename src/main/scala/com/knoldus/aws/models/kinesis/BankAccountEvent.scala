@@ -5,6 +5,7 @@ import java.util.UUID
 
 sealed trait BankAccountEvent {
   def accountNumber: UUID
+  def toJsonString: String
 }
 
 case class CreateBankAccountEvent(
@@ -13,14 +14,21 @@ case class CreateBankAccountEvent(
   accountType: String,
   securityCode: String,
   balance: Double
-) extends BankAccountEvent
+) extends BankAccountEvent {
 
-object CreateBankAccount {
+  override def toJsonString: String = Json.stringify(Json.toJson(this))
+}
+
+object CreateBankAccountEvent {
+
   implicit val format: Format[CreateBankAccountEvent] = Json.format
 }
 
-case class UpdateBankAccountEvent(accountNumber: UUID, updatedBalance: Double) extends BankAccountEvent
+case class UpdateBankAccountEvent(accountNumber: UUID, updatedBalance: Double) extends BankAccountEvent {
 
-object UpdateBankAccount {
+  override def toJsonString: String = Json.stringify(Json.toJson(this))
+}
+
+object UpdateBankAccountEvent {
   implicit val format: Format[UpdateBankAccountEvent] = Json.format
 }
