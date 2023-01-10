@@ -20,3 +20,4 @@ trait DataMigrationService {
   def deleteFile(key: String): DeletedObject
 
 }
+object DataMigrationService

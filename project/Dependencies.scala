@@ -35,6 +35,7 @@ object Dependencies {
     val PlayJson = "com.typesafe.play" %% "play-json" % PlayJsonVersion
     //val PureConfig = "com.github.pureconfig" %% "pureconfig" % PureConfigVersion
     val ScalaLogging = "com.typesafe.scala-logging" %% "scala-logging" % ScalaLoggingVersion
+    lazy val macWire = "com.softwaremill.macwire" %% "macros" % "2.5.7"
     val AkkaActor = "com.typesafe.akka" %% "akka-actor" % AkkaVersion
     val AkkaStream = "com.typesafe.akka" %% "akka-stream" % AkkaVersion
     val AkkaHttp = "com.typesafe.akka" %% "akka-http" % AkkaHttpVersion
@@ -49,6 +50,7 @@ object Dependencies {
     val All: Seq[ModuleID] = Seq(
       ScalaLogging,
       PlayJson,
+      macWire,
      // PureConfig,
       AkkaActor,
       AkkaStream,

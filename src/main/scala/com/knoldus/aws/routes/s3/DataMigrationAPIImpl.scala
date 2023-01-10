@@ -1,20 +1,20 @@
 package com.knoldus.aws.routes.s3
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, StatusCodes }
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ExceptionHandler, Route}
+import akka.http.scaladsl.server.{ ExceptionHandler, Route }
 import akka.util.ByteString
 import com.knoldus.aws.models.s3.FileRetrieveRequest
-import com.knoldus.aws.services.s3.DataMigrationService
+import com.knoldus.aws.services.s3.{ DataMigrationService, DataMigrationServiceImpl }
 import com.knoldus.aws.utils.JsonSupport
 import com.typesafe.scalalogging.LazyLogging
 
-class DataMigrationAPIImpl(dataMigrationService: DataMigrationService)
+class DataMigrationAPIImpl(dataMigrationService: DataMigrationServiceImpl)
     extends DataMigrationAPI
     with JsonSupport
     with LazyLogging {
 
-  val dataMigrationAPIRoutes: Route = uploadFileToS3 ~ retrieveFile ~ copyFile ~ deleteFile()
+  val routes: Route = uploadFileToS3 ~ retrieveFile ~ copyFile ~ deleteFile()
 
   implicit val noSuchElementExceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: NoSuchElementException =>
