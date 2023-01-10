@@ -6,7 +6,7 @@ import java.io.File
 
 case class FileUploadRequest(filePath: File)
 
-case class FileRetrieveRequest(fileName: String, key: String, versionId: Option[String])
+case class FileRetrieveRequest(bucketName: String, fileName: String, key: String, versionId: Option[String])
 
 object FileRetrieveRequest {
 
@@ -14,6 +14,24 @@ object FileRetrieveRequest {
 
   def apply(json: JsValue): Either[String, FileRetrieveRequest] =
     json.validate[FileRetrieveRequest] match {
+      case JsSuccess(user, _) => Right(user)
+      case e => Left(s"Failed to deserialize Question $e")
+    }
+}
+
+case class CopyObjectRequest(
+  sourceBucketName: String,
+  sourceKey: String,
+  destinationBucketName: String,
+  destinationKey: String
+)
+
+object CopyObjectRequest {
+
+  implicit val format: Format[CopyObjectRequest] = Json.format
+
+  def apply(json: JsValue): Either[String, CopyObjectRequest] =
+    json.validate[CopyObjectRequest] match {
       case JsSuccess(user, _) => Right(user)
       case e => Left(s"Failed to deserialize Question $e")
     }

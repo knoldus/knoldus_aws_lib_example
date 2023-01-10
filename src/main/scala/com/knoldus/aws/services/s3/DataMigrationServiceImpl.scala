@@ -6,14 +6,16 @@ import com.knoldus.s3.services.S3Service
 import java.io.File
 import scala.util.{ Failure, Success, Try }
 
-class DataMigrationServiceImpl(bucket: Bucket) extends DataMigrationService {
+class DataMigrationServiceImpl extends DataMigrationService {
 
   implicit val s3Service: S3Service = S3Service
 
-  override def uploadFileToS3(file: File, key: String): PutObjectResult =
+  override def uploadFileToS3(file: File, key: String)(implicit bucket: Bucket): PutObjectResult =
     s3Service.putObject(bucket, key, file)
 
-  override def retrieveFile(key: String, versionId: Option[String]): Either[Throwable, S3Object] =
+  override def retrieveFile(key: String, versionId: Option[String])(implicit
+    bucket: Bucket
+  ): Either[Throwable, S3Object] =
     Try(s3Service.getS3Object(bucket, key, versionId)) match {
       case Failure(exception) => Left(exception)
       case Success(s3Object) => Right(s3Object)
@@ -24,8 +26,11 @@ class DataMigrationServiceImpl(bucket: Bucket) extends DataMigrationService {
     sourceKey: String,
     destinationBucketName: String,
     destinationKey: String
-  ): PutObjectResult =
-    s3Service.copyS3Object(sourceBucketName, sourceKey, destinationBucketName, destinationKey)
+  ): Either[Throwable, PutObjectResult] =
+    Try(s3Service.copyS3Object(sourceBucketName, sourceKey, destinationBucketName, destinationKey)) match {
+      case Failure(exception) => Left(exception)
+      case Success(putObjectResult) => Right(putObjectResult)
+    }
 
-  override def deleteFile(key: String): DeletedObject = s3Service.deleteObject(bucket, key)
+  override def deleteFile(key: String)(implicit bucket: Bucket): DeletedObject = s3Service.deleteObject(bucket, key)
 }
