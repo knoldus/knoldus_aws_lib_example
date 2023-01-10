@@ -24,7 +24,7 @@ object CreateBankAccountEvent {
   implicit val format: Format[CreateBankAccountEvent] = Json.format
 }
 
-case class UpdateBankAccountEvent(accountNumber: UUID, updatedBalance: Double) extends BankAccountEvent {
+case class UpdateBankAccountEvent(accountNumber: UUID, updateType: String, amount: Double) extends BankAccountEvent {
 
   override def toJsonString: String = Json.stringify(Json.toJson(this))
 }
