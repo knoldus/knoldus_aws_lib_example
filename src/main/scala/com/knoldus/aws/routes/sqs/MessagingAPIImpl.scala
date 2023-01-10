@@ -8,7 +8,9 @@ import akka.http.scaladsl.server.Directives._
 class MessagingAPIImpl extends MessagingAPI with JsonSupport with LazyLogging {
 
   val routes: Route =
-    createQueue ~ listQueues ~ deleteQueue() ~ sendMsgToFIFOQueue ~ sendMsgToStandardQueue ~ sendMultipleMsgToFIFOQueue ~ sendMultipleMsgToStandardQueue ~ receiveMessage ~ receiveMultipleMessages ~ deleteMessage() ~ deleteMultipleMessages()
+    createQueue ~ listQueues ~ deleteQueue() ~ sendMsgToFIFOQueue ~ sendMsgToStandardQueue ~
+        sendMultipleMsgToFIFOQueue ~ sendMultipleMsgToStandardQueue ~ receiveMessage ~
+        receiveMultipleMessages ~ deleteMessage() ~ deleteMultipleMessages()
 
   override def createQueue: Route = ???
 

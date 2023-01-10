@@ -1,16 +1,16 @@
 package com.knoldus.aws.services.sqs
 
-import akka.http.javadsl.server.Route
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sqs.model.DeleteQueueResult
+import com.amazonaws.services.sqs.model.QueueNameExistsException
+import com.knoldus.aws.utils.Constants._
 import com.knoldus.common.aws.CredentialsLookup
 import com.knoldus.sqs.models.QueueType.QueueType
-import com.knoldus.sqs.models.{ Queue, SQSConfig }
+import com.knoldus.sqs.models.{ Message, Queue, QueueType, SQSConfig }
 import com.knoldus.sqs.services.SQSService
 import com.knoldus.sqs.services.SQSService.buildAmazonSQSClient
 
-import scala.concurrent.Future
+import scala.util.{ Failure, Success, Try }
 
 class MessagingServiceImpl(config: SQSConfig) extends MessagingService with SQSService {
 
@@ -23,10 +23,71 @@ class MessagingServiceImpl(config: SQSConfig) extends MessagingService with SQSS
   implicit val sqsService: SQSService = SQSService
 
   override def createNewQueue(queueName: String, queueType: QueueType): Either[Throwable, Queue] =
-    sqsService.createQueue(queueName, queueType)
+    sqsService.createQueue(queueName, queueType) match {
+      case Left(_: QueueNameExistsException) =>
+        val updatedQueueName = if (queueType.equals(QueueType.FIFO)) queueName + FIFO else queueName
+        Right(findQueueByName(updatedQueueName).getOrElse(Queue(EMPTY_STRING)))
+      case Left(ex) => Left(ex)
+      case Right(value) => Right(value)
+    }
 
-  override def deletingQueue(queue: Queue): Future[DeleteQueueResult] =
-    sqsService.deleteQueue(queue)
+  override def deletingQueue(queue: Queue): Either[Throwable, String] =
+    Try(sqsService.deleteQueue(queue)) match {
+      case Failure(exception) => Left(exception)
+      case Success(_) => Right(QUEUE_DELETED)
+    }
 
   override def listingQueues: Seq[Queue] = sqsService.listQueues
+
+  override def sendMessageToQueue(
+    queue: Queue,
+    messageBody: String,
+    messageGroupId: Option[String],
+    messageAttributes: Option[Map[String, String]],
+    delaySeconds: Option[Int]
+  ): Either[Throwable, String] =
+    Try(
+      sqsService.sendMessage(
+        queue: Queue,
+        messageBody: String,
+        messageGroupId: Option[String],
+        messageAttributes: Option[Map[String, String]],
+        delaySeconds: Option[Int]
+      )
+    ) match {
+      case Failure(exception) => Left(exception)
+      case Success(_) => Right(MESSAGE_SENT)
+    }
+
+  override def sendMultipleMessagesToQueue(
+    queue: Queue,
+    messageBodies: Seq[String],
+    messageGroupId: Option[String],
+    messageAttributes: Option[Map[String, String]],
+    delaySeconds: Option[Int]
+  ): Either[Throwable, String] =
+    Try(
+      sqsService.sendMessages(
+        queue: Queue,
+        messageBodies: Seq[String],
+        messageGroupId: Option[String],
+        messageAttributes: Option[Map[String, String]],
+        delaySeconds: Option[Int]
+      )
+    ) match {
+      case Failure(exception) => Left(exception)
+      case Success(_) => Right(MESSAGES_SENT)
+    }
+
+  override def receiveMessage(
+    queue: Queue,
+    maxNumberOfMessages: Int = TEN,
+    waitForSeconds: Int = ZERO
+  ): Either[Throwable, Seq[Message]] =
+    Try(sqsService.receiveMessages(queue, maxNumberOfMessages, waitForSeconds)) match {
+      case Failure(exception) => Left(exception)
+      case Success(value) => Right(value)
+    }
+
+  // override def deleteMessage(queue: Queue, messageId: String): Unit = ???
 }
