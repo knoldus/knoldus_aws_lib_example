@@ -16,10 +16,7 @@ class DataMigrationServiceImpl extends DataMigrationService {
   override def retrieveFile(key: String, versionId: Option[String])(implicit
     bucket: Bucket
   ): Either[Throwable, S3Object] =
-    Try(s3Service.getS3Object(bucket, key, versionId)) match {
-      case Failure(exception) => Left(exception)
-      case Success(s3Object) => Right(s3Object)
-    }
+    s3Service.getS3Object(bucket, key, versionId)
 
   override def copyFile(
     sourceBucketName: String,
@@ -32,5 +29,9 @@ class DataMigrationServiceImpl extends DataMigrationService {
       case Success(putObjectResult) => Right(putObjectResult)
     }
 
-  override def deleteFile(key: String)(implicit bucket: Bucket): DeletedObject = s3Service.deleteObject(bucket, key)
+  override def deleteFile(key: String)(implicit bucket: Bucket): Either[Throwable, DeletedObject] =
+    Try(s3Service.deleteObject(bucket, key)) match {
+      case Failure(exception) => Left(exception)
+      case Success(deletedObject) => Right(deletedObject)
+    }
 }

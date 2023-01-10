@@ -11,4 +11,8 @@ trait DataMigrationAPI {
   def copyFile: Route
 
   def deleteFile(): Route
+
+  //def getAllObjects: Route
+
+  //def getAllObjectSummaries: Route
 }

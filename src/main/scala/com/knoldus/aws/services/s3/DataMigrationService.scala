@@ -17,6 +17,5 @@ trait DataMigrationService {
     destinationKey: String
   ): Either[Throwable, PutObjectResult]
 
-  def deleteFile(key: String)(implicit bucket: Bucket): DeletedObject
-
+  def deleteFile(key: String)(implicit bucket: Bucket): Either[Throwable, DeletedObject]
 }

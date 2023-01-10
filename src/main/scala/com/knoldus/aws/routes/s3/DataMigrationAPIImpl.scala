@@ -1,16 +1,16 @@
 package com.knoldus.aws.routes.s3
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, StatusCodes }
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ExceptionHandler, Route}
+import akka.http.scaladsl.server.{ ExceptionHandler, Route }
 import akka.util.ByteString
-import com.knoldus.aws.models.s3.{CopyObjectRequest, FileRetrieveRequest}
+import com.knoldus.aws.models.s3.{ CopyObjectRequest, FileRetrieveRequest, ObjectDeletionRequest }
 import com.knoldus.aws.services.s3.DataMigrationServiceImpl
 import com.knoldus.aws.utils.JsonSupport
 import com.knoldus.s3.models.Bucket
 import com.typesafe.scalalogging.LazyLogging
 
-class DataMigrationAPIImpl(dataMigrationService: DataMigrationServiceImpl)
+class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
     extends DataMigrationAPI
     with JsonSupport
     with LazyLogging {
@@ -41,14 +41,15 @@ class DataMigrationAPIImpl(dataMigrationService: DataMigrationServiceImpl)
       pathEnd {
         (get & entity(as[FileRetrieveRequest])) { fileRetrieveRequest =>
           handleExceptions(noSuchElementExceptionHandler) {
-            logger.info(s"Making request for searching the S3 bucket.")
+            logger.info(s"Making request for retrieving object from the S3 bucket.")
             implicit val bucket: Bucket = Bucket(fileRetrieveRequest.bucketName)
-            dataMigrationService.retrieveFile(fileRetrieveRequest.key, fileRetrieveRequest.versionId) match {
+            dataMigrationServiceImpl.retrieveFile(fileRetrieveRequest.key, fileRetrieveRequest.versionId) match {
               case Left(ex) =>
                 complete(
                   HttpResponse(
                     StatusCodes.NotFound,
-                    entity = HttpEntity(ContentTypes.`application/json`, ByteString("S3 Object not found."))
+                    entity =
+                      HttpEntity(ContentTypes.`application/json`, ByteString(s"S3 Object not found. ${ex.getMessage}"))
                   )
                 )
               case Right(s3Object) =>
@@ -67,10 +68,10 @@ class DataMigrationAPIImpl(dataMigrationService: DataMigrationServiceImpl)
   override def copyFile: Route =
     path("bucket" / "copyObject") {
       pathEnd {
-        (get & entity(as[CopyObjectRequest])) { copyObjectRequest =>
+        (post & entity(as[CopyObjectRequest])) { copyObjectRequest =>
           handleExceptions(noSuchElementExceptionHandler) {
             logger.info(s"Making request for copying object from the S3 bucket.")
-            dataMigrationService.copyFile(
+            dataMigrationServiceImpl.copyFile(
               copyObjectRequest.sourceBucketName,
               copyObjectRequest.sourceKey,
               copyObjectRequest.destinationBucketName,
@@ -99,5 +100,32 @@ class DataMigrationAPIImpl(dataMigrationService: DataMigrationServiceImpl)
       }
     }
 
-  override def deleteFile(): Route = ???
+  override def deleteFile(): Route =
+    path("bucket" / "deleteObject") {
+      pathEnd {
+        (delete & entity(as[ObjectDeletionRequest])) { objectDeletionRequest =>
+          logger.info("Making request for S3 object deletion")
+          implicit val bucket: Bucket = Bucket(objectDeletionRequest.bucketName)
+          dataMigrationServiceImpl.deleteFile(objectDeletionRequest.key) match {
+            case Left(ex) =>
+              complete(
+                HttpResponse(
+                  StatusCodes.InternalServerError,
+                  entity = HttpEntity(
+                    ContentTypes.`application/json`,
+                    ByteString(s"Unable to delete S3 object: ${ex.getMessage}")
+                  )
+                )
+              )
+            case Right(deletedObject) =>
+              complete(
+                HttpResponse(
+                  StatusCodes.OK,
+                  entity = HttpEntity(ContentTypes.`application/json`, ByteString(deletedObject.toString))
+                )
+              )
+          }
+        }
+      }
+    }
 }
