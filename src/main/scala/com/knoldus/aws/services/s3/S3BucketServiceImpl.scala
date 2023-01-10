@@ -14,8 +14,8 @@ class S3BucketServiceImpl(conf: Config) extends S3BucketService with S3Service {
   val accessKey: String = conf.getString("aws-access-key")
   val secretKey: String = conf.getString("aws-secret-key")
   val region: String = conf.getString("aws-region")
-  val serviceEndpoint: String = conf.getString("aws-serviceEndpoint")
-  val configuration = Configuration(AWSConfig(accessKey, secretKey, region), S3Config(serviceEndpoint))
+  val s3ServiceEndpoint: String = conf.getString("aws-serviceEndpoint")
+  val configuration = Configuration(AWSConfig(accessKey, secretKey, region), S3Config(s3ServiceEndpoint))
 
   override val amazonS3Client: AmazonS3 = {
     val credentials: AWSCredentialsProvider =
