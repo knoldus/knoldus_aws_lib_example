@@ -15,14 +15,14 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
     with JsonSupport
     with LazyLogging {
 
-  val dataMigrationAPIRoutes: Route = uploadFileToS3 ~ retrieveFile ~ copyFile ~ deleteFile()
+  val routes: Route = retrieveFile ~ copyFile ~ deleteFile()
 
   implicit val noSuchElementExceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: NoSuchElementException =>
       complete(StatusCodes.NotFound, e.getMessage)
   }
 
-  override def uploadFileToS3: Route = ???
+  // override def uploadFileToS3: Route = ???
   //    path("bucket" / "create") {
   //      pathEnd {
   //        (post & entity(as[Multipart.FormData])) { fileUploadRequest =>

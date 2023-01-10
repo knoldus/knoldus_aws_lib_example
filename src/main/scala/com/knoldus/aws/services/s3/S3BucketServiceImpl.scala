@@ -1,7 +1,8 @@
 package com.knoldus.aws.services.s3
 
-import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.auth.{ AWSCredentialsProvider, DefaultAWSCredentialsProviderChain }
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
+import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
 import com.knoldus.common.aws.CredentialsLookup
 import com.knoldus.s3.models.{ Bucket, Configuration }
 import com.knoldus.s3.services.S3Service
@@ -14,6 +15,15 @@ class S3BucketServiceImpl(s3config: Configuration) extends S3BucketService with 
       CredentialsLookup.getCredentialsProvider(s3config.awsConfig.awsAccessKey, s3config.awsConfig.awsSecretKey)
     buildAmazonS3Client(s3config, credentials)
   }
+
+//  override val amazonS3Client: AmazonS3 = AmazonS3ClientBuilder
+//    .standard()
+//    .withEndpointConfiguration(
+//      new EndpointConfiguration("http://localhost:4566", "us-east-1")
+//    )
+//    .withCredentials(new DefaultAWSCredentialsProviderChain())
+//    .withPathStyleAccessEnabled(true)
+//    .build()
 
   implicit val s3Service: S3Service = S3Service
 

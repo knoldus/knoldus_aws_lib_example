@@ -4,7 +4,7 @@ import akka.http.scaladsl.server.Route
 
 trait DataMigrationAPI {
 
-  def uploadFileToS3: Route
+  // def uploadFileToS3: Route
 
   def retrieveFile: Route
 
