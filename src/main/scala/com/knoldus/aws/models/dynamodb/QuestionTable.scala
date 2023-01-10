@@ -1,4 +1,4 @@
-package com.knoldus.aws.examples.models
+package com.knoldus.aws.models.dynamodb
 
 import com.knoldus.dynamodb.dao.DynamoTable
 

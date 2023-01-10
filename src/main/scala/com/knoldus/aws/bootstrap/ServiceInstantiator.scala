@@ -1,7 +1,7 @@
-package com.knoldus.aws.examples.bootstrap
+package com.knoldus.aws.bootstrap
 
-import com.knoldus.aws.examples.models.QuestionTable
-import com.knoldus.aws.examples.services.QuestionServiceImpl
+import com.knoldus.aws.models.dynamodb.QuestionTable
+import com.knoldus.aws.services.dynamodb.QuestionServiceImpl
 import com.typesafe.config.Config
 
 class ServiceInstantiator(conf: Config) {

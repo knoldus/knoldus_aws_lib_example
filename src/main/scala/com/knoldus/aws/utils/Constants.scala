@@ -1,4 +1,4 @@
-package com.knoldus.aws.examples.utils
+package com.knoldus.aws.utils
 
 object Constants {
 

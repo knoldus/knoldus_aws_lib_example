@@ -1,7 +1,7 @@
-package com.knoldus.aws.examples.services
+package com.knoldus.aws.services.dynamodb
 
-import com.knoldus.aws.examples.models.{ Question, QuestionTable, QuestionUpdate }
-import com.knoldus.aws.examples.utils.Constants
+import com.knoldus.aws.models.dynamodb.{ Question, QuestionTable, QuestionUpdate }
+import com.knoldus.aws.utils.Constants
 import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json.Json
 

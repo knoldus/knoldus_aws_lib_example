@@ -1,11 +1,11 @@
-package com.knoldus.aws.examples.routes
+package com.knoldus.aws.routes.dynamodb
 
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{ ExceptionHandler, Route }
 import akka.http.scaladsl.server.Directives._
-import com.knoldus.aws.examples.models.{ Question, QuestionUpdate }
-import com.knoldus.aws.examples.services.QuestionService
-import com.knoldus.aws.examples.utils.JsonSupport
+import akka.http.scaladsl.server.{ ExceptionHandler, Route }
+import com.knoldus.aws.models.dynamodb.{ Question, QuestionUpdate }
+import com.knoldus.aws.services.dynamodb.QuestionService
+import com.knoldus.aws.utils.JsonSupport
 import com.typesafe.scalalogging.LazyLogging
 
 class QuestionAPIImpl(questionService: QuestionService) extends QuestionAPI with LazyLogging with JsonSupport {

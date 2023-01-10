@@ -1,4 +1,4 @@
-package com.knoldus.aws.examples.bootstrap
+package com.knoldus.aws.bootstrap
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
