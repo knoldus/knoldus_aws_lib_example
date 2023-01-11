@@ -4,21 +4,29 @@ import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, Status
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ ExceptionHandler, Route }
 import akka.util.ByteString
-import com.knoldus.aws.models.sqs.{ CreateQueueRequest, DeleteQueueRequest, SendMessageToFifoRequest }
+import com.knoldus.aws.models.sqs.{
+  CreateQueueRequest,
+  DeleteQueueRequest,
+  SendMessageToFifoRequest,
+  SendMessageToStandardRequest,
+  SendMessagesToFifoRequest
+}
 import com.knoldus.aws.services.sqs.MessagingServiceImpl
 import com.knoldus.aws.utils.Constants._
 import com.knoldus.aws.utils.JsonSupport
+import com.knoldus.sqs.models.Queue
 import com.typesafe.scalalogging.LazyLogging
+import spray.json.enrichAny
 
 class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
     extends MessagingAPI
     with JsonSupport
     with LazyLogging {
 
-//  val routes: Route =
-//    createQueue ~ listQueues ~ deleteQueue() ~ sendMsgToFIFOQueue ~ sendMsgToStandardQueue ~
-//      sendMultipleMsgToFIFOQueue ~ sendMultipleMsgToStandardQueue ~ receiveMessage ~
-//      receiveMultipleMessages ~ deleteMessage() ~ deleteMultipleMessages()
+  //  val routes: Route =
+  //    createQueue ~ listQueues ~ deleteQueue() ~ sendMsgToFIFOQueue ~ sendMsgToStandardQueue ~
+  //      sendMultipleMsgToFIFOQueue ~ sendMultipleMsgToStandardQueue ~ receiveMessage ~
+  //      receiveMultipleMessages ~ deleteMessage() ~ deleteMultipleMessages()
 
   implicit val noSuchElementExceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: NoSuchElementException =>
@@ -43,7 +51,7 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
               complete(
                 HttpResponse(
                   StatusCodes.OK,
-                  entity = HttpEntity(ContentTypes.`application/json`, ByteString(queue.toString))
+                  entity = HttpEntity(ContentTypes.`application/json`, queue.toString)
                 )
               )
           }
@@ -67,7 +75,10 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
               )
             else
               complete(
-                HttpResponse(StatusCodes.OK, entity = HttpEntity(ContentTypes.`application/json`, queueSeq.toString()))
+                HttpResponse(
+                  StatusCodes.OK,
+                  entity = HttpEntity(ContentTypes.`application/json`, queueSeq.toJson.prettyPrint)
+                )
               )
           }
         }
@@ -109,42 +120,117 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
       }
     }
 
-//    override def sendMsgToFIFOQueue: Route = path("queue" / "fifo" / "sendMessage") {
-//      pathEnd {
-//        (post & entity(as[SendMessageToFifoRequest])) { sendMessageToFifoRequest =>
-//          logger.info("Making request for sending message to fifo queue")
-//          val bucket = messagingServiceImpl.createNewQueue(createQueueRequest.queueName, createQueueRequest.queueType)
-//          bucket match {
-//            case Left(ex) =>
-//              complete(
-//                HttpResponse(
-//                  StatusCodes.InternalServerError,
-//                  entity =
-//                    HttpEntity(ContentTypes.`application/json`, ByteString(s"Exception ${ex.getMessage}"))
-//                )
-//              )
-//            case Right(queue) =>
-//              complete(
-//                HttpResponse(
-//                  StatusCodes.OK,
-//                  entity = HttpEntity(ContentTypes.`application/json`, ByteString(queue.toString))
-//                )
-//              )
-//          }
-//        }
-//      }
-//    }
-  //
-  //    override def sendMsgToStandardQueue: Route = ???
-  //
-  //    override def sendMultipleMsgToFIFOQueue: Route = ???
-  //
-  //    override def sendMultipleMsgToStandardQueue: Route = ???
-  //
-  //    override def receiveMessage: Route = ???
-  //
-  //    override def receiveMultipleMessages: Route = ???
-  //
+  override def sendMsgToFIFOQueue: Route =
+    path("queue" / "fifo" / "sendMessage") {
+      pathEnd {
+        (post & entity(as[SendMessageToFifoRequest])) { sendMessageToFifoRequest =>
+          logger.info("Making request for sending message to fifo queue")
+          parameter("messageAttributes".as[Map[String, String]].optional, "waitForSeconds".as[Int].optional) {
+            (messageAttributes, delaySeconds) =>
+              val queue = messagingServiceImpl
+                .searchQueueByName(sendMessageToFifoRequest.queueName)
+                .getOrElse(Queue(EMPTY_STRING))
+              messagingServiceImpl.sendMessageToQueue(
+                queue,
+                sendMessageToFifoRequest.messageBody,
+                Some(sendMessageToFifoRequest.messageGroupId),
+                messageAttributes,
+                delaySeconds
+              ) match {
+                case Left(ex) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(ContentTypes.`application/json`, ByteString(s"Exception ${ex.getMessage}"))
+                    )
+                  )
+                case Right(msg) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.OK,
+                      entity = HttpEntity(ContentTypes.`application/json`, msg)
+                    )
+                  )
+              }
+          }
+        }
+      }
+    }
+
+  override def sendMsgToStandardQueue: Route =
+    path("queue" / "standard" / "sendMessage") {
+      pathEnd {
+        (post & entity(as[SendMessageToStandardRequest])) { sendMessageToFifoRequest =>
+          logger.info("Making request for sending message to standard queue")
+          parameter("messageAttributes".as[Map[String, String]].optional, "waitForSeconds".as[Int].optional) {
+            (messageAttributes, delaySeconds) =>
+              val queue = messagingServiceImpl
+                .searchQueueByName(sendMessageToFifoRequest.queueName)
+                .getOrElse(Queue(EMPTY_STRING))
+              messagingServiceImpl.sendMessageToQueue(
+                queue,
+                sendMessageToFifoRequest.messageBody,
+                None,
+                messageAttributes,
+                delaySeconds
+              ) match {
+                case Left(ex) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(ContentTypes.`application/json`, ByteString(s"Exception ${ex.getMessage}"))
+                    )
+                  )
+                case Right(msg) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.OK,
+                      entity = HttpEntity(ContentTypes.`application/json`, msg)
+                    )
+                  )
+              }
+          }
+        }
+      }
+    }
+
+  override def sendMultipleMsgToFIFOQueue: Route =
+    path("queue" / "fifo" / "sendMultipleMessage") {
+      pathEnd {
+        (post & entity(as[SendMessagesToFifoRequest])) { sendMessagesToFifoRequest =>
+          logger.info("Making request for sending multiple messages to fifo queue")
+          parameter("messageAttributes".as[Map[String, String]].optional, "waitForSeconds".as[Int].optional) {
+            (messageAttributes, delaySeconds) =>
+              val queue = messagingServiceImpl
+                .searchQueueByName(sendMessagesToFifoRequest.queueName)
+                .getOrElse(Queue(EMPTY_STRING))
+              messagingServiceImpl.sendMultipleMessagesToQueue(
+                queue,
+                sendMessagesToFifoRequest.messageBodies,
+                Some(sendMessagesToFifoRequest.messageGroupId),
+                messageAttributes,
+                delaySeconds
+              ) match {
+                case Left(ex) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(ContentTypes.`application/json`, ByteString(s"Exception ${ex.getMessage}"))
+                    )
+                  )
+                case Right(msg) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.OK,
+                      entity = HttpEntity(ContentTypes.`application/json`, msg)
+                    )
+                  )
+              }
+          }
+        }
+      }
+    }
+
   //    override def deleteMessage(): Route = ???
   //
   //    override def deleteMultipleMessages(): Route = ???

@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.directives.FileInfo
 import akka.http.scaladsl.server.{ ExceptionHandler, Route }
 import akka.util.ByteString
 import com.knoldus.aws.bootstrap.DriverApp.actorSystem
-import com.knoldus.aws.models.s3.{ CopyObjectRequest, FileRetrieveRequest, ObjectDeletionRequest }
+import com.knoldus.aws.models.s3.{ CopyObjectRequest, ObjectDeletionRequest, RetrieveObjectRequest }
 import com.knoldus.aws.services.s3.DataMigrationServiceImpl
 import com.knoldus.aws.utils.Constants.FILE_UPLOADED
 import com.knoldus.aws.utils.JsonSupport
@@ -65,7 +65,7 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
   override def retrieveFile: Route =
     path("bucket" / "retrieveObject") {
       pathEnd {
-        (get & entity(as[FileRetrieveRequest])) { fileRetrieveRequest =>
+        (get & entity(as[RetrieveObjectRequest])) { fileRetrieveRequest =>
           handleExceptions(noSuchElementExceptionHandler) {
             logger.info(s"Making request for retrieving object from the S3 bucket.")
             implicit val bucket: Bucket = Bucket(fileRetrieveRequest.bucketName)

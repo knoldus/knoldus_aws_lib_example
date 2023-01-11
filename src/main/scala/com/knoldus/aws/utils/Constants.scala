@@ -20,6 +20,5 @@ object Constants {
   final val ZERO = 0
   final val TEN = 10
 
-
   final val FILE_UPLOADED = "The specified file is uploaded to the S3 bucket successfully."
 }
