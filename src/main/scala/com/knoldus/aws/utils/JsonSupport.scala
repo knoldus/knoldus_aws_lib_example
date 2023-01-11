@@ -12,18 +12,20 @@ import com.knoldus.aws.models.s3.{
 import com.knoldus.aws.models.sqs.{
   CreateQueueRequest,
   DeleteQueueRequest,
+  MessageResponse,
+  ReceiveMessageRequest,
   SendMessageToFifoRequest,
+  SendMessagesToStandardRequest,
   SendMessageToStandardRequest,
   SendMessagesToFifoRequest
 }
-import com.knoldus.sqs.models.Queue
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val bucketFormat: RootJsonFormat[S3Bucket] = jsonFormat1(S3Bucket.apply)
 
   implicit val s3BucketResponseFormat: RootJsonFormat[S3BucketResponse] = jsonFormat2(S3BucketResponse.apply)
 
-  implicit val fileRetrieveRequestFormat: RootJsonFormat[RetrieveObjectRequest] = jsonFormat4(
+  implicit val retrieveObjectRequestFormat: RootJsonFormat[RetrieveObjectRequest] = jsonFormat4(
     RetrieveObjectRequest.apply
   )
 
@@ -36,6 +38,16 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val createQueueRequestFormat: RootJsonFormat[CreateQueueRequest] = jsonFormat2(CreateQueueRequest.apply)
 
   implicit val deleteQueueRequestFormat: RootJsonFormat[DeleteQueueRequest] = jsonFormat1(DeleteQueueRequest.apply)
+
+  implicit val ReceiveMessageRequestFormat: RootJsonFormat[ReceiveMessageRequest] = jsonFormat1(
+    ReceiveMessageRequest.apply
+  )
+
+  implicit val MessageResponseFormat: RootJsonFormat[MessageResponse] = jsonFormat2(MessageResponse.apply)
+
+  implicit val SendMessagesToStandardRequestFormat: RootJsonFormat[SendMessagesToStandardRequest] = jsonFormat3(
+    SendMessagesToStandardRequest.apply
+  )
 
   implicit val sendMessageToFifoRequestFormat: RootJsonFormat[SendMessageToFifoRequest] = jsonFormat5(
     SendMessageToFifoRequest.apply

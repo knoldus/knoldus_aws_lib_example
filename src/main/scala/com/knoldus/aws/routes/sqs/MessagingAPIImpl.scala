@@ -1,8 +1,8 @@
 package com.knoldus.aws.routes.sqs
 
-import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, StatusCodes }
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ ExceptionHandler, Route }
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import akka.util.ByteString
 import com.knoldus.aws.models.sqs.{
   CreateQueueRequest,
@@ -11,6 +11,7 @@ import com.knoldus.aws.models.sqs.{
   SendMessageToStandardRequest,
   SendMessagesToFifoRequest
 }
+import com.knoldus.aws.models.sqs._
 import com.knoldus.aws.services.sqs.MessagingServiceImpl
 import com.knoldus.aws.utils.Constants._
 import com.knoldus.aws.utils.JsonSupport
@@ -225,6 +226,92 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
                       entity = HttpEntity(ContentTypes.`application/json`, msg)
                     )
                   )
+              }
+          }
+        }
+      }
+    }
+
+
+  override def sendMultipleMsgToStandardQueue: Route =
+    path("queue" / "standard" / "sendMultipleMessage") {
+      pathEnd {
+        (post & entity(as[SendMessagesToStandardRequest])) { sendMessagesToStandardRequest =>
+          logger.info("Making request for sending multiple messages to standard queue")
+          parameter("messageAttributes".as[Map[String, String]].optional, "waitForSeconds".as[Int].optional) {
+            (messageAttributes, delaySeconds) =>
+              val queue = messagingServiceImpl
+                .searchQueueByName(sendMessagesToStandardRequest.queueName)
+                .getOrElse(Queue(EMPTY_STRING))
+              messagingServiceImpl.sendMultipleMessagesToQueue(
+                queue,
+                sendMessagesToStandardRequest.messageBody,
+                None,
+                messageAttributes,
+                delaySeconds
+              ) match {
+                case Left(ex) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(ContentTypes.`application/json`, ByteString(s"Exception ${ex.getMessage}"))
+                    )
+                  )
+                case Right(msg) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.OK,
+                      entity = HttpEntity(ContentTypes.`application/json`, msg)
+                    )
+                  )
+              }
+          }
+        }
+      }
+    }
+
+  override def receiveMessage: Route =
+    path("queue" / "receiveMessage") {
+      pathEnd {
+        (delete & entity(as[ReceiveMessageRequest])) { receiveMessageRequest =>
+          parameter("maxNumberOfMessages".as[Int].optional, "waitForSeconds".as[Int].optional) {
+            (maxNumberOfMessages, waitForSeconds) =>
+              logger.info("Making request for receiveMessage")
+              messagingServiceImpl.searchQueueByName(receiveMessageRequest.queueName) match {
+                case None =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(ContentTypes.`application/json`, NO_QUEUES_FOUND)
+                    )
+                  )
+                case Some(queue) =>
+                  messagingServiceImpl.receiveMessage(
+                    queue,
+                    maxNumberOfMessages.getOrElse(10),
+                    waitForSeconds.getOrElse(0)
+                  ) match {
+                    case Left(ex) =>
+                      complete(
+                        HttpResponse(
+                          StatusCodes.InternalServerError,
+                          entity = HttpEntity(
+                            ContentTypes.`application/json`,
+                            s"Cannot be received message for the specified queue : $ex"
+                          )
+                        )
+                      )
+                    case Right(messages) =>
+                      val messageResponse = messages.map { message =>
+                        MessageResponse(message.id, message.body)
+                      }
+                      complete(
+                        HttpResponse(
+                          StatusCodes.OK,
+                          entity = HttpEntity(ContentTypes.`application/json`, messageResponse.toJson.prettyPrint)
+                        )
+                      )
+                  }
               }
           }
         }

@@ -16,6 +16,7 @@ object Constants {
   final val MESSAGES_SENT = "The messages have been successfully sent."
   final val MESSAGE_DELETED = "The message has been successfully deleted."
   final val NO_QUEUES_FOUND = "No queues found for specified SQS configuration."
+  final val MESSAGE_RECEIVED = "The message has been successfully received."
 
   final val ZERO = 0
   final val TEN = 10

@@ -16,6 +16,9 @@ trait MessagingAPI {
 
   def sendMultipleMsgToFIFOQueue: Route
 
+  def sendMultipleMsgToStandardQueue: Route
+
+  def receiveMessage: Route
 //  def deleteMessage(): Route
 //
 //  def deleteMultipleMessages(): Route
