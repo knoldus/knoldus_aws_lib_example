@@ -19,6 +19,7 @@ trait MessagingAPI {
   def sendMultipleMsgToStandardQueue: Route
 
   def receiveMessage: Route
+
 //  def deleteMessage(): Route
 //
 //  def deleteMultipleMessages(): Route

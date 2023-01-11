@@ -6,6 +6,7 @@ import ch.megard.akka.http.cors.scaladsl.CorsDirectives.cors
 import ch.megard.akka.http.cors.scaladsl.settings.CorsSettings
 import com.knoldus.aws.routes.dynamodb.QuestionAPIImpl
 import com.knoldus.aws.routes.s3.{ DataMigrationAPIImpl, S3BucketAPIImpl }
+import com.knoldus.aws.routes.sqs.MessagingAPIImpl
 
 class RoutesInstantiator(
   services: ServiceInstantiator
@@ -20,11 +21,15 @@ class RoutesInstantiator(
   private val dataMigrationAPIImplRoutes: DataMigrationAPIImpl =
     new DataMigrationAPIImpl(services.dataMigrationServiceImpl)
 
+  private val messagingAPIImplRoutes: MessagingAPIImpl =
+    new MessagingAPIImpl(services.messagingService)
+
   val routes: Route = cors(CorsSettings.defaultSettings) {
     concat(
       //questionAPIRoutes.routes,
       s3BucketRoutes.routes,
-      dataMigrationAPIImplRoutes.routes
+      dataMigrationAPIImplRoutes.routes,
+      messagingAPIImplRoutes.routes
     )
   }
 }

@@ -24,9 +24,6 @@ class MessagingServiceImpl(config: SQSConfig) extends MessagingService with SQSS
 
   override def createNewQueue(queueName: String, queueType: QueueType): Either[Throwable, Queue] =
     sqsService.createQueue(queueName, queueType) match {
-      case Left(_: QueueNameExistsException) =>
-        val updatedQueueName = if (queueType.equals(QueueType.FIFO)) queueName + FIFO else queueName
-        Right(findQueueByName(updatedQueueName).getOrElse(Queue(EMPTY_STRING)))
       case Left(ex) => Left(ex)
       case Right(value) => Right(value)
     }

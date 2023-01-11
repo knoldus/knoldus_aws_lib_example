@@ -8,7 +8,7 @@ import akka.util.ByteString
 import com.knoldus.aws.bootstrap.DriverApp.actorSystem
 import com.knoldus.aws.models.s3.{ CopyObjectRequest, ObjectDeletionRequest, RetrieveObjectRequest }
 import com.knoldus.aws.services.s3.DataMigrationServiceImpl
-import com.knoldus.aws.utils.Constants.FILE_UPLOADED
+import com.knoldus.aws.utils.Constants.OBJECT_UPLOADED
 import com.knoldus.aws.utils.JsonSupport
 import com.knoldus.s3.models.Bucket
 import com.typesafe.scalalogging.LazyLogging
@@ -42,7 +42,7 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
                       StatusCodes.InternalServerError,
                       entity = HttpEntity(
                         ContentTypes.`application/json`,
-                        ByteString(s"File could not be uploaded to S3 Bucket : ${error.getMessage}")
+                        s"File could not be uploaded to S3 Bucket : ${error.getMessage}"
                       )
                     )
                   )
@@ -50,7 +50,7 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
                   complete(
                     HttpResponse(
                       StatusCodes.OK,
-                      entity = HttpEntity(ContentTypes.`application/json`, ByteString(FILE_UPLOADED))
+                      entity = HttpEntity(ContentTypes.`application/json`, OBJECT_UPLOADED)
                     )
                   )
               }
@@ -74,15 +74,14 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
                 complete(
                   HttpResponse(
                     StatusCodes.NotFound,
-                    entity =
-                      HttpEntity(ContentTypes.`application/json`, ByteString(s"S3 Object not found. ${ex.getMessage}"))
+                    entity = HttpEntity(ContentTypes.`application/json`, s"S3 Object not found. ${ex.getMessage}")
                   )
                 )
               case Right(s3Object) =>
                 complete(
                   HttpResponse(
                     StatusCodes.OK,
-                    entity = HttpEntity(ContentTypes.`application/json`, ByteString(s3Object.toString))
+                    entity = HttpEntity(ContentTypes.`application/json`, s3Object.toString)
                   )
                 )
             }
@@ -109,7 +108,7 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
                     StatusCodes.NotFound,
                     entity = HttpEntity(
                       ContentTypes.`application/json`,
-                      ByteString(s"Unable to copy S3 object: ${ex.getMessage}")
+                      s"Unable to copy S3 object: ${ex.getMessage}"
                     )
                   )
                 )
@@ -117,7 +116,7 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
                 complete(
                   HttpResponse(
                     StatusCodes.OK,
-                    entity = HttpEntity(ContentTypes.`application/json`, ByteString(putObjectResult.toString))
+                    entity = HttpEntity(ContentTypes.`application/json`, putObjectResult.toString)
                   )
                 )
             }
@@ -139,7 +138,7 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
                   StatusCodes.InternalServerError,
                   entity = HttpEntity(
                     ContentTypes.`application/json`,
-                    ByteString(s"Unable to delete S3 object: ${ex.getMessage}")
+                    s"Unable to delete S3 object: ${ex.getMessage}"
                   )
                 )
               )
@@ -147,7 +146,7 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
               complete(
                 HttpResponse(
                   StatusCodes.OK,
-                  entity = HttpEntity(ContentTypes.`application/json`, ByteString(deletedObject.toString))
+                  entity = HttpEntity(ContentTypes.`application/json`, deletedObject.toString)
                 )
               )
           }

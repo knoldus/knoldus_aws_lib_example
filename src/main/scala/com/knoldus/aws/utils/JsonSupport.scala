@@ -2,23 +2,8 @@ package com.knoldus.aws.utils
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import spray.json._
-import com.knoldus.aws.models.s3.{
-  CopyObjectRequest,
-  ObjectDeletionRequest,
-  RetrieveObjectRequest,
-  S3Bucket,
-  S3BucketResponse
-}
-import com.knoldus.aws.models.sqs.{
-  CreateQueueRequest,
-  DeleteQueueRequest,
-  MessageResponse,
-  ReceiveMessageRequest,
-  SendMessageToFifoRequest,
-  SendMessagesToStandardRequest,
-  SendMessageToStandardRequest,
-  SendMessagesToFifoRequest
-}
+import com.knoldus.aws.models.s3._
+import com.knoldus.aws.models.sqs._
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val bucketFormat: RootJsonFormat[S3Bucket] = jsonFormat1(S3Bucket.apply)

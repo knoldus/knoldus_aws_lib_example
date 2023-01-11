@@ -37,7 +37,7 @@ class S3BucketAPIImpl(s3BucketService: S3BucketService) extends S3BucketAPI with
         (delete & entity(as[S3Bucket])) { bucketDeletionRequest =>
           logger.info("Making request for S3 bucket deletion")
           val response = s3BucketService.searchS3Bucket(bucketDeletionRequest.bucketName) match {
-            case None => throw new NotFoundException(BUCKET_DOES_NOT_EXIST)
+            case None => throw new NotFoundException(BUCKET_NOT_FOUND)
             case Some(bucket) =>
               s3BucketService.deleteS3Bucket(bucket)
               S3BucketResponse(BUCKET_DELETED, bucket.name)
