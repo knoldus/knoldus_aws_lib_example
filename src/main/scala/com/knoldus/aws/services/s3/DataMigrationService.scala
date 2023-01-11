@@ -6,7 +6,7 @@ import java.io.File
 
 trait DataMigrationService {
 
-  def uploadFileToS3(file: File, key: String)(implicit bucket: Bucket): PutObjectResult
+  def uploadFileToS3(file: File, key: String)(implicit bucket: Bucket): Either[Throwable, PutObjectResult]
 
   def retrieveFile(key: String, versionId: Option[String])(implicit bucket: Bucket): Either[Throwable, S3Object]
 
