@@ -16,11 +16,10 @@ trait MessagingAPI {
 //
 //  def sendMultipleMsgToFIFOQueue: Route
 //
-//  def sendMultipleMsgToStandardQueue: Route
+  def sendMultipleMsgToStandardQueue: Route
 //
-//  def receiveMessage: Route
+  def receiveMessage: Route
 //
-//  def receiveMultipleMessages: Route
 //
 //  def deleteMessage(): Route
 //
