@@ -1,13 +1,8 @@
 package com.knoldus.aws.utils
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import com.knoldus.aws.models.dynamodb.{ Question, QuestionUpdate }
-import com.knoldus.aws.models.kinesis.{
-  BankAccountCreationEventRequest,
-  BankAccountEvent,
-  CreateBankAccountEvent,
-  UpdateBankAccountEvent
-}
+import com.knoldus.aws.models.dynamodb.{Question, QuestionUpdate}
+import com.knoldus.aws.models.kinesis.{BankAccountCreationEventRequest, BankAccountEvent, CreateBankAccountEvent, UpdateBankAccountEvent, UpdateBankAccountEventRequest}
 import spray.json._
 
 import java.util.UUID
@@ -18,6 +13,10 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol with UUIDPro
 
   implicit val bankAccountCreationEventRequestFormat: RootJsonFormat[BankAccountCreationEventRequest] = jsonFormat4(
     BankAccountCreationEventRequest.apply
+  )
+
+  implicit val updateBankAccountEventRequestFormat: RootJsonFormat[UpdateBankAccountEventRequest] = jsonFormat2(
+    UpdateBankAccountEventRequest.apply
   )
 
   implicit val createBankAccountEventFormat: RootJsonFormat[CreateBankAccountEvent] = jsonFormat5(
