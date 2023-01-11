@@ -9,7 +9,7 @@ import com.typesafe.scalalogging.LazyLogging
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BankAccountEventPublisher(val config: Config) extends LazyLogging{
+class BankAccountEventPublisher(val config: Config) extends LazyLogging {
 
   private val kinesisDataProducer = new KinesisDataProducer(config)
 
