@@ -1,17 +1,17 @@
 package com.knoldus.aws.services.sqs
 
-import akka.http.javadsl.server.Route
-import com.amazonaws.services.sqs.model.DeleteQueueResult
-import com.knoldus.sqs.models.{ Message, Queue }
 import com.knoldus.sqs.models.QueueType.QueueType
-
-import scala.concurrent.Future
+import com.knoldus.sqs.models.{ Message, Queue }
 
 trait MessagingService {
 
   def createNewQueue(queueName: String, queueType: QueueType): Either[Throwable, Queue]
 
   def listingQueues: Seq[Queue]
+
+  def listingQueueNames: Seq[String]
+
+  def searchQueueByName(queueName: String): Option[Queue]
 
   def deletingQueue(queue: Queue): Either[Throwable, String]
 

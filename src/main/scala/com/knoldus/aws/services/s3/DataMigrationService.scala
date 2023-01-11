@@ -19,4 +19,3 @@ trait DataMigrationService {
 
   def deleteFile(key: String)(implicit bucket: Bucket): Either[Throwable, DeletedObject]
 }
-object DataMigrationService

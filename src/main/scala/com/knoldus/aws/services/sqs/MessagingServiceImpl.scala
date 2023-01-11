@@ -39,6 +39,10 @@ class MessagingServiceImpl(config: SQSConfig) extends MessagingService with SQSS
 
   override def listingQueues: Seq[Queue] = sqsService.listQueues
 
+  override def listingQueueNames: Seq[String] = sqsService.listQueuesByName
+
+  override def searchQueueByName(queueName: String): Option[Queue] = sqsService.findQueueByName(queueName)
+
   override def sendMessageToQueue(
     queue: Queue,
     messageBody: String,
@@ -90,4 +94,5 @@ class MessagingServiceImpl(config: SQSConfig) extends MessagingService with SQSS
     }
 
   // override def deleteMessage(queue: Queue, messageId: String): Unit = ???
+
 }
