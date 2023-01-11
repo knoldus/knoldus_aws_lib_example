@@ -1,6 +1,6 @@
 package com.knoldus.aws.models.kinesis
 
-case class BankAccountCreationRequest(
+case class BankAccountCreationEventRequest(
   accountOwner: String,
   accountType: String,
   securityCode: String,

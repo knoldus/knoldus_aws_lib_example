@@ -1,7 +1,7 @@
 package com.knoldus.aws.services.kinesis
 
 import com.knoldus.aws.models.kinesis.{
-  BankAccountCreationRequest,
+  BankAccountCreationEventRequest,
   BankAccountEvent,
   CreateBankAccountEvent,
   UpdateBankAccountEvent
@@ -15,7 +15,7 @@ import scala.concurrent.Future
 class BankAccountEventGenerator(bankAccountEventPublisher: BankAccountEventPublisher) extends LazyLogging {
   val stream: String = bankAccountEventPublisher.config.getString("kinesis-data-stream-name")
 
-  def createBankAccountEvent(bankAccountDetails: BankAccountCreationRequest): Future[BankAccountEvent] = {
+  def createBankAccountEvent(bankAccountDetails: BankAccountCreationEventRequest): Future[BankAccountEvent] = {
     val newAccountNumber = UUID.randomUUID()
     val bankAccountEvent = CreateBankAccountEvent(
       newAccountNumber,

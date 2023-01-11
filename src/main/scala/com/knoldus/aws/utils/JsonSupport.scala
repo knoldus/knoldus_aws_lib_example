@@ -2,7 +2,12 @@ package com.knoldus.aws.utils
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import com.knoldus.aws.models.dynamodb.{ Question, QuestionUpdate }
-import com.knoldus.aws.models.kinesis.{ CreateBankAccountEvent, UpdateBankAccountEvent }
+import com.knoldus.aws.models.kinesis.{
+  BankAccountCreationEventRequest,
+  BankAccountEvent,
+  CreateBankAccountEvent,
+  UpdateBankAccountEvent
+}
 import spray.json._
 
 import java.util.UUID
@@ -11,6 +16,10 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol with UUIDPro
   implicit val questionFormat: RootJsonFormat[Question] = jsonFormat4(Question.apply)
   implicit val questionUpdateFormat: RootJsonFormat[QuestionUpdate] = jsonFormat2(QuestionUpdate.apply)
 
+  implicit val bankAccountCreationEventRequestFormat: RootJsonFormat[BankAccountCreationEventRequest] = jsonFormat4(
+    BankAccountCreationEventRequest.apply
+  )
+
   implicit val createBankAccountEventFormat: RootJsonFormat[CreateBankAccountEvent] = jsonFormat5(
     CreateBankAccountEvent.apply
   )
@@ -18,6 +27,17 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol with UUIDPro
   implicit val updateBankAccountEventFormat: RootJsonFormat[UpdateBankAccountEvent] = jsonFormat3(
     UpdateBankAccountEvent.apply
   )
+
+  implicit val bankAccountEventFormat: RootJsonFormat[BankAccountEvent] = new RootJsonFormat[BankAccountEvent] {
+
+    def write(obj: BankAccountEvent): JsValue =
+      JsObject((obj match {
+        case c: CreateBankAccountEvent => c.toJson
+        case d: UpdateBankAccountEvent => d.toJson
+      }).asJsObject.fields)
+
+    def read(json: JsValue): BankAccountEvent = ???
+  }
 }
 
 trait UUIDProtocol {
