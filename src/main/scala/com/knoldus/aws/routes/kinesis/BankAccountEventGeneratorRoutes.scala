@@ -13,7 +13,7 @@ class BankAccountEventGeneratorRoutes(bankAccountEventGenerator: BankAccountEven
   val routes: Route = createBankAccountEvent ~ creditBankAccountEvent ~ debitBankAccountEvent
 
   def createBankAccountEvent: Route =
-    path("event/bank-account" / "create") {
+    path("event" / "bank-account" / "create") {
       pathEnd {
         (post & entity(as[BankAccountCreationEventRequest])) { bankAccountCreationRequest =>
           logger.info("Making event request for bank account creation")
@@ -24,7 +24,7 @@ class BankAccountEventGeneratorRoutes(bankAccountEventGenerator: BankAccountEven
     }
 
   def creditBankAccountEvent: Route =
-    path("event/bank-account" / "credit") {
+    path("event" / "bank-account" / "credit") {
       pathEnd {
         (put & entity(as[UpdateBankAccountEventRequest])) { creditBankAccountEventRequest =>
           logger.info("Making event request for crediting a bank account")
@@ -38,11 +38,11 @@ class BankAccountEventGeneratorRoutes(bankAccountEventGenerator: BankAccountEven
     }
 
   def debitBankAccountEvent: Route =
-    path("event/bank-account" / "debit") {
+    path("event" / "bank-account" / "debit") {
       pathEnd {
         (put & entity(as[UpdateBankAccountEventRequest])) { debitBankAccountEventRequest =>
           logger.info("Making event request for debiting a bank account")
-          val response = bankAccountEventGenerator.creditBankAccountEvent(
+          val response = bankAccountEventGenerator.debitBankAccountEvent(
             debitBankAccountEventRequest.accountNumber,
             debitBankAccountEventRequest.amount
           )

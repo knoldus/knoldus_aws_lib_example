@@ -13,14 +13,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BankAccountEventGenerator(bankAccountEventPublisher: BankAccountEventPublisher) extends LazyLogging {
-  val stream: String = bankAccountEventPublisher.config.getString("kinesis-data-stream-name")
+  val stream: String = bankAccountEventPublisher.config.getString("data-stream-name")
 
   def createBankAccountEvent(bankAccountDetails: BankAccountCreationEventRequest): Future[BankAccountEvent] = {
     val newAccountNumber = UUID.randomUUID()
     val bankAccountEvent = CreateBankAccountEvent(
       newAccountNumber,
       bankAccountDetails.accountOwner,
-      bankAccountDetails.accountOwner,
+      bankAccountDetails.accountType,
       bankAccountDetails.securityCode,
       bankAccountDetails.initialBalance
     )
