@@ -1,14 +1,20 @@
 package com.knoldus.aws.routes.s3
 
-import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, StatusCodes }
+import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.directives.FileInfo
 import akka.http.scaladsl.server.{ ExceptionHandler, Route }
 import akka.util.ByteString
+import com.knoldus.aws.bootstrap.DriverApp.actorSystem
 import com.knoldus.aws.models.s3.{ CopyObjectRequest, FileRetrieveRequest, ObjectDeletionRequest }
 import com.knoldus.aws.services.s3.DataMigrationServiceImpl
+import com.knoldus.aws.utils.Constants.FILE_UPLOADED
 import com.knoldus.aws.utils.JsonSupport
 import com.knoldus.s3.models.Bucket
 import com.typesafe.scalalogging.LazyLogging
+
+import java.io.File
+import java.util.UUID
 
 class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
     extends DataMigrationAPI
@@ -22,19 +28,39 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
       complete(StatusCodes.NotFound, e.getMessage)
   }
 
-  // override def uploadFileToS3: Route = ???
-  //    path("bucket" / "create") {
-  //      pathEnd {
-  //        (post & entity(as[Multipart.FormData])) { fileUploadRequest =>
-  //          logger.info("Making request for uploading file to S3 bucket")
-  //          fileUploadRequest match {
-  //            case data: FormData => data
-  //          }
-  //
-  //          complete(response)
-  //        }
-  //      }
-  //    }
+  override def uploadFileToS3: Route =
+    path("bucket" / "upload" / "file") {
+      (post & entity(as[Multipart.FormData])) { _ =>
+        formField("bucketName", "key") { (bucketName, key) =>
+          storeUploadedFile("file", tempDestination) {
+            case (_, file: File) =>
+              implicit val bucket: Bucket = Bucket(bucketName)
+              dataMigrationServiceImpl.uploadFileToS3(file, key) match {
+                case Left(error) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(
+                        ContentTypes.`application/json`,
+                        ByteString(s"File could not be uploaded to S3 Bucket : ${error.getMessage}")
+                      )
+                    )
+                  )
+                case Right(_) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.OK,
+                      entity = HttpEntity(ContentTypes.`application/json`, ByteString(FILE_UPLOADED))
+                    )
+                  )
+              }
+          }
+        }
+      }
+    }
+
+  private def tempDestination(fileInfo: FileInfo): File =
+    File.createTempFile(UUID.randomUUID().toString, UUID.nameUUIDFromBytes(fileInfo.fileName.getBytes).toString)
 
   override def retrieveFile: Route =
     path("bucket" / "retrieveObject") {

@@ -10,8 +10,11 @@ class DataMigrationServiceImpl extends DataMigrationService {
 
   implicit val s3Service: S3Service = S3Service
 
-  override def uploadFileToS3(file: File, key: String)(implicit bucket: Bucket): PutObjectResult =
-    s3Service.putObject(bucket, key, file)
+  override def uploadFileToS3(file: File, key: String)(implicit bucket: Bucket): Either[Throwable, PutObjectResult] =
+    Try(s3Service.putObject(bucket, key, file)) match {
+      case Failure(exception) => Left(exception)
+      case Success(putObjectResult) => Right(putObjectResult)
+    }
 
   override def retrieveFile(key: String, versionId: Option[String])(implicit
     bucket: Bucket
