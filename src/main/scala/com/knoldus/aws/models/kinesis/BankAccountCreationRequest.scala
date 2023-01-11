@@ -4,5 +4,5 @@ case class BankAccountCreationRequest(
   accountOwner: String,
   accountType: String,
   securityCode: String,
-  balance: Double
+  initialBalance: Double
 )
