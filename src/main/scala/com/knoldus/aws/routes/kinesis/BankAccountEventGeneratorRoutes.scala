@@ -3,7 +3,7 @@ package com.knoldus.aws.routes.kinesis
 import akka.http.scaladsl.server.Route
 import com.knoldus.aws.services.kinesis.BankAccountEventGenerator
 import akka.http.scaladsl.server.Directives._
-import com.knoldus.aws.models.kinesis.BankAccountCreationEventRequest
+import com.knoldus.aws.models.kinesis.{ BankAccountCreationEventRequest, UpdateBankAccountEventRequest }
 import com.knoldus.aws.utils.JsonSupport
 import com.typesafe.scalalogging.LazyLogging
 
@@ -23,7 +23,31 @@ class BankAccountEventGeneratorRoutes(bankAccountEventGenerator: BankAccountEven
       }
     }
 
-  def creditBankAccountEvent: Route = ???
+  def creditBankAccountEvent: Route =
+    path("event/bank-account" / "credit") {
+      pathEnd {
+        (put & entity(as[UpdateBankAccountEventRequest])) { creditBankAccountEventRequest =>
+          logger.info("Making event request for crediting a bank account")
+          val response = bankAccountEventGenerator.creditBankAccountEvent(
+            creditBankAccountEventRequest.accountNumber,
+            creditBankAccountEventRequest.amount
+          )
+          complete(response)
+        }
+      }
+    }
 
-  def debitBankAccountEvent: Route = ???
+  def debitBankAccountEvent: Route =
+    path("event/bank-account" / "debit") {
+      pathEnd {
+        (put & entity(as[UpdateBankAccountEventRequest])) { debitBankAccountEventRequest =>
+          logger.info("Making event request for debiting a bank account")
+          val response = bankAccountEventGenerator.creditBankAccountEvent(
+            debitBankAccountEventRequest.accountNumber,
+            debitBankAccountEventRequest.amount
+          )
+          complete(response)
+        }
+      }
+    }
 }

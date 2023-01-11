@@ -1,8 +1,14 @@
 package com.knoldus.aws.utils
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import com.knoldus.aws.models.dynamodb.{Question, QuestionUpdate}
-import com.knoldus.aws.models.kinesis.{BankAccountCreationEventRequest, BankAccountEvent, CreateBankAccountEvent, UpdateBankAccountEvent, UpdateBankAccountEventRequest}
+import com.knoldus.aws.models.dynamodb.{ Question, QuestionUpdate }
+import com.knoldus.aws.models.kinesis.{
+  BankAccountCreationEventRequest,
+  BankAccountEvent,
+  CreateBankAccountEvent,
+  UpdateBankAccountEvent,
+  UpdateBankAccountEventRequest
+}
 import spray.json._
 
 import java.util.UUID
