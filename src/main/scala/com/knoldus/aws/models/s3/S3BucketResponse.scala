@@ -2,7 +2,7 @@ package com.knoldus.aws.models.s3
 
 import play.api.libs.json.{ Format, JsSuccess, JsValue, Json }
 
-case class S3BucketResponse(message: String, bucketName: String)
+case class S3BucketResponse(bucketName: String)
 
 object S3BucketResponse {
 

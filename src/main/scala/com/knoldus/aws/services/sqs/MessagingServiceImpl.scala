@@ -2,25 +2,27 @@ package com.knoldus.aws.services.sqs
 
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.services.sqs.AmazonSQS
-import com.amazonaws.services.sqs.model.QueueNameExistsException
 import com.knoldus.aws.utils.Constants._
 import com.knoldus.common.aws.CredentialsLookup
 import com.knoldus.sqs.models.QueueType.QueueType
-import com.knoldus.sqs.models.{ Message, Queue, QueueType, SQSConfig }
+import com.knoldus.sqs.models.{ Message, Queue, SQSConfig }
 import com.knoldus.sqs.services.SQSService
 import com.knoldus.sqs.services.SQSService.buildAmazonSQSClient
 
 import scala.util.{ Failure, Success, Try }
 
-class MessagingServiceImpl(config: SQSConfig) extends MessagingService with SQSService {
+class MessagingServiceImpl(sqsConfig: SQSConfig) extends MessagingService {
 
-  override val amazonSQSClient: AmazonSQS = {
-    val credentials: AWSCredentialsProvider =
-      CredentialsLookup.getCredentialsProvider(config.awsConfig.awsAccessKey, config.awsConfig.awsSecretKey)
-    buildAmazonSQSClient(config, credentials)
+  implicit val sqsService: SQSService = new SQSService {
+
+    override val config: SQSConfig = sqsConfig
+
+    override val amazonSQSClient: AmazonSQS = {
+      val credentials: AWSCredentialsProvider =
+        CredentialsLookup.getCredentialsProvider(config.awsConfig.awsAccessKey, config.awsConfig.awsSecretKey)
+      buildAmazonSQSClient(config, credentials)
+    }
   }
-
-  implicit val sqsService: SQSService = SQSService
 
   override def createNewQueue(queueName: String, queueType: QueueType): Either[Throwable, Queue] =
     sqsService.createQueue(queueName, queueType) match {
@@ -89,7 +91,4 @@ class MessagingServiceImpl(config: SQSConfig) extends MessagingService with SQSS
       case Failure(exception) => Left(exception)
       case Success(value) => Right(value)
     }
-
-  // override def deleteMessage(queue: Queue, messageId: String): Unit = ???
-
 }

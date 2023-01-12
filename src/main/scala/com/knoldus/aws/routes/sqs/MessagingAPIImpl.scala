@@ -334,8 +334,4 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
         }
       }
     }
-
-  //    override def deleteMessage(): Route = ???
-  //
-  //    override def deleteMultipleMessages(): Route = ???
 }

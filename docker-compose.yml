@@ -13,7 +13,7 @@ services:
       - SERVICES=kinesis, dynamodb, s3, sqs
       - EDGE_PORT=4566
       - DATA_DIR=/tmp/localstack/data
-      - DEFAULT_REGION=ap-south-1
+      - DEFAULT_REGION=us-east-1
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"

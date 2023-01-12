@@ -4,11 +4,11 @@ import com.knoldus.s3.models.Bucket
 
 trait S3BucketService {
 
-  def createS3Bucket(bucketName: String): Bucket
+  def createS3Bucket(bucketName: String): Either[Throwable, Bucket]
 
-  def deleteS3Bucket(bucket: Bucket): Unit
+  def deleteS3Bucket(bucket: Bucket): Either[Throwable, String]
 
-  def listAllBuckets: Option[List[Bucket]]
+  def listAllBuckets: Either[Throwable, Option[Seq[Bucket]]]
 
   def searchS3Bucket(name: String): Option[Bucket]
 }

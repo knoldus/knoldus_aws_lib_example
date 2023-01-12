@@ -1,14 +1,14 @@
 package com.knoldus.aws.routes.s3
 
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, StatusCodes }
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ ExceptionHandler, Route }
-import com.knoldus.aws.exceptions.NotFoundException
-import com.knoldus.aws.models.s3.{ S3Bucket, S3BucketResponse }
+import com.knoldus.aws.models.s3.{ S3Bucket, S3BucketResponse, S3BucketsResponse }
 import com.knoldus.aws.services.s3.S3BucketService
 import com.knoldus.aws.utils.Constants._
 import com.knoldus.aws.utils.JsonSupport
 import com.typesafe.scalalogging.LazyLogging
+import spray.json.enrichAny
 
 class S3BucketAPIImpl(s3BucketService: S3BucketService) extends S3BucketAPI with JsonSupport with LazyLogging {
 
@@ -24,9 +24,22 @@ class S3BucketAPIImpl(s3BucketService: S3BucketService) extends S3BucketAPI with
       pathEnd {
         (post & entity(as[S3Bucket])) { bucketCreationRequest =>
           logger.info("Making request for S3 bucket creation")
-          val bucket = s3BucketService.createS3Bucket(bucketCreationRequest.bucketName)
-          val response = S3BucketResponse(BUCKET_CREATED, bucket.name)
-          complete(response)
+          s3BucketService.createS3Bucket(bucketCreationRequest.bucketName) match {
+            case Left(ex) =>
+              complete(
+                HttpResponse(
+                  StatusCodes.InternalServerError,
+                  entity = HttpEntity(ContentTypes.`application/json`, s"Exception ${ex.getMessage}")
+                )
+              )
+            case Right(_) =>
+              complete(
+                HttpResponse(
+                  StatusCodes.OK,
+                  entity = HttpEntity(ContentTypes.`application/json`, BUCKET_CREATED)
+                )
+              )
+          }
         }
       }
     }
@@ -36,13 +49,32 @@ class S3BucketAPIImpl(s3BucketService: S3BucketService) extends S3BucketAPI with
       pathEnd {
         (delete & entity(as[S3Bucket])) { bucketDeletionRequest =>
           logger.info("Making request for S3 bucket deletion")
-          val response = s3BucketService.searchS3Bucket(bucketDeletionRequest.bucketName) match {
-            case None => throw new NotFoundException(BUCKET_NOT_FOUND)
+          s3BucketService.searchS3Bucket(bucketDeletionRequest.bucketName) match {
+            case None =>
+              complete(
+                HttpResponse(
+                  StatusCodes.InternalServerError,
+                  entity = HttpEntity(ContentTypes.`application/json`, BUCKET_NOT_FOUND)
+                )
+              )
             case Some(bucket) =>
-              s3BucketService.deleteS3Bucket(bucket)
-              S3BucketResponse(BUCKET_DELETED, bucket.name)
+              s3BucketService.deleteS3Bucket(bucket) match {
+                case Left(ex) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(
+                        ContentTypes.`application/json`,
+                        s"The specified bucket could not be deleted : ${ex.getMessage}"
+                      )
+                    )
+                  )
+                case Right(msg) =>
+                  complete(
+                    HttpResponse(StatusCodes.OK, entity = HttpEntity(ContentTypes.`application/json`, msg))
+                  )
+              }
           }
-          complete(response)
         }
       }
     }
@@ -53,11 +85,23 @@ class S3BucketAPIImpl(s3BucketService: S3BucketService) extends S3BucketAPI with
         (get & entity(as[S3Bucket])) { searchBucketRequest =>
           handleExceptions(noSuchElementExceptionHandler) {
             logger.info(s"Making request for searching the S3 bucket.")
-            val response = s3BucketService.searchS3Bucket(searchBucketRequest.bucketName) match {
-              case Some(bucket) => S3BucketResponse(BUCKET_FOUND, bucket.name)
-              case None => throw new NotFoundException(NO_BUCKETS_FOUND)
+            s3BucketService.searchS3Bucket(searchBucketRequest.bucketName) match {
+              case None =>
+                complete(
+                  HttpResponse(
+                    StatusCodes.NotFound,
+                    entity = HttpEntity(ContentTypes.`application/json`, BUCKET_NOT_FOUND)
+                  )
+                )
+              case Some(bucket) =>
+                complete(
+                  HttpResponse(
+                    StatusCodes.OK,
+                    entity =
+                      HttpEntity(ContentTypes.`application/json`, S3BucketResponse(bucket.name).toJson.prettyPrint)
+                  )
+                )
             }
-            complete(response)
           }
         }
       }
@@ -69,14 +113,36 @@ class S3BucketAPIImpl(s3BucketService: S3BucketService) extends S3BucketAPI with
         get {
           handleExceptions(noSuchElementExceptionHandler) {
             logger.info(s"Making request for getting all the S3 buckets.")
-            val response = s3BucketService.listAllBuckets match {
-              case Some(buckets) =>
-                buckets.map { bucket =>
-                  S3Bucket(bucket.name)
+            s3BucketService.listAllBuckets match {
+              case Left(ex) =>
+                complete(
+                  HttpResponse(
+                    StatusCodes.InternalServerError,
+                    entity = HttpEntity(
+                      ContentTypes.`application/json`,
+                      s"Exception: ${ex.getMessage}"
+                    )
+                  )
+                )
+              case Right(bucketSeq) =>
+                bucketSeq match {
+                  case None =>
+                    complete(
+                      HttpResponse(
+                        StatusCodes.NoContent,
+                        entity = HttpEntity(ContentTypes.`application/json`, NO_BUCKETS_FOUND)
+                      )
+                    )
+                  case Some(buckets) =>
+                    val bucketResponse = S3BucketsResponse(buckets.map(_.name))
+                    complete(
+                      HttpResponse(
+                        StatusCodes.OK,
+                        entity = HttpEntity(ContentTypes.`application/json`, bucketResponse.toJson.prettyPrint)
+                      )
+                    )
                 }
-              case None => throw new NotFoundException(NO_BUCKETS_FOUND)
             }
-            complete(response)
           }
         }
       }

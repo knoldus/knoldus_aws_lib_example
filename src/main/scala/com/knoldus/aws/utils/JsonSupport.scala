@@ -8,7 +8,9 @@ import com.knoldus.aws.models.sqs._
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val bucketFormat: RootJsonFormat[S3Bucket] = jsonFormat1(S3Bucket.apply)
 
-  implicit val s3BucketResponseFormat: RootJsonFormat[S3BucketResponse] = jsonFormat2(S3BucketResponse.apply)
+  implicit val s3BucketResponseFormat: RootJsonFormat[S3BucketResponse] = jsonFormat1(S3BucketResponse.apply)
+
+  implicit val s3BucketsResponseFormat: RootJsonFormat[S3BucketsResponse] = jsonFormat1(S3BucketsResponse.apply)
 
   implicit val retrieveObjectRequestFormat: RootJsonFormat[RetrieveObjectRequest] = jsonFormat4(
     RetrieveObjectRequest.apply
