@@ -10,7 +10,9 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit val s3BucketResponseFormat: RootJsonFormat[S3BucketResponse] = jsonFormat1(S3BucketResponse.apply)
 
-  implicit val s3BucketsResponseFormat: RootJsonFormat[S3BucketsResponse] = jsonFormat1(S3BucketsResponse.apply)
+  implicit val s3BucketListResponseFormat: RootJsonFormat[S3BucketListResponse] = jsonFormat1(
+    S3BucketListResponse.apply
+  )
 
   implicit val retrieveObjectRequestFormat: RootJsonFormat[RetrieveObjectRequest] = jsonFormat4(
     RetrieveObjectRequest.apply
@@ -55,4 +57,9 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val sendMessagesToFifoRequestFormat: RootJsonFormat[SendMessagesToFifoRequest] = jsonFormat5(
     SendMessagesToFifoRequest.apply
   )
+
+  implicit val retrieveBucketKeysResponseFormat: RootJsonFormat[RetrieveBucketKeysRequest] = jsonFormat2(
+    RetrieveBucketKeysRequest.apply
+  )
+
 }

@@ -53,4 +53,15 @@ class S3BucketServiceImpl(s3config: Configuration) extends S3BucketService {
 
   override def searchS3Bucket(name: String): Option[Bucket] =
     s3Service.getBucketByName(name)
+
+  override def retrieveBucketKeys(bucket: Bucket, prefix: Option[String]): Either[Throwable, Seq[String]] = {
+    val tryToRetrieveBucketKeys = prefix match {
+      case Some(somePrefix) => Try(s3Service.keys(bucket, somePrefix))
+      case None => Try(s3Service.keys(bucket))
+    }
+    tryToRetrieveBucketKeys match {
+      case Failure(ex) => Left(ex)
+      case Success(keys) => Right(keys)
+    }
+  }
 }

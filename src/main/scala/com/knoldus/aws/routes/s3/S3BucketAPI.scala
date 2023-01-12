@@ -12,6 +12,6 @@ trait S3BucketAPI {
 
   def listAllBuckets: Route
 
-  //def getBucketKeys
+  def retrieveAllBucketKeys: Route
 
 }

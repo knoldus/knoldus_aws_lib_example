@@ -11,4 +11,6 @@ trait S3BucketService {
   def listAllBuckets: Either[Throwable, Option[Seq[Bucket]]]
 
   def searchS3Bucket(name: String): Option[Bucket]
+
+  def retrieveBucketKeys(bucket: Bucket, prefix: Option[String]): Either[Throwable, Seq[String]]
 }
