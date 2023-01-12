@@ -1,7 +1,7 @@
 package com.knoldus.aws.services.sqs
 
 import com.knoldus.sqs.models.QueueType.QueueType
-import com.knoldus.sqs.models.{ Message, Queue }
+import com.knoldus.sqs.models.{Message, Queue}
 
 trait MessagingService {
 
@@ -33,8 +33,8 @@ trait MessagingService {
 
   def receiveMessage(queue: Queue, maxNumberOfMessages: Int, waitForSeconds: Int): Either[Throwable, Seq[Message]]
 
-  //def deleteMessage(queue: Queue, messageId: String)
-  //
-  //  def deleteMultipleMessages()
+  def deleteMessageFromQueue(queueUrl: String, receiptHandle: String): Either[Throwable, String]
+
+  def deleteMultipleMessagesFromQueue(queueUrl: String, receiptHandle: Seq[String]): Either[Throwable, String]
 
 }

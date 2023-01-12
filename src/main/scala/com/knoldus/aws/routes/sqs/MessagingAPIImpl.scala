@@ -1,8 +1,8 @@
 package com.knoldus.aws.routes.sqs
 
-import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, StatusCodes }
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ ExceptionHandler, Route }
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import com.knoldus.aws.models.sqs._
 import com.knoldus.aws.services.sqs.MessagingServiceImpl
 import com.knoldus.aws.utils.Constants._
@@ -244,7 +244,7 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
     }
 
   override def sendMultipleMsgToStandardQueue: Route =
-    path("queue" / "standard" / "sendMultipleMessage") {
+    path("queue" / "standard" / "sendMultipleMessages") {
       pathEnd {
         (post & entity(as[SendMessagesToStandardRequest])) { sendMessagesToStandardRequest =>
           logger.info("Making request for sending multiple messages to standard queue.")
@@ -261,7 +261,7 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
                 case Some(queue) =>
                   messagingServiceImpl.sendMultipleMessagesToQueue(
                     queue,
-                    sendMessagesToStandardRequest.messageBody,
+                    sendMessagesToStandardRequest.messageBodies,
                     None,
                     messageAttributes,
                     delaySeconds
@@ -290,7 +290,7 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
   override def receiveMessage: Route =
     path("queue" / "receiveMessage") {
       pathEnd {
-        (delete & entity(as[ReceiveMessageRequest])) { receiveMessageRequest =>
+        (get & entity(as[ReceiveMessageRequest])) { receiveMessageRequest =>
           parameter("maxNumberOfMessages".as[Int].optional, "waitForSeconds".as[Int].optional) {
             (maxNumberOfMessages, waitForSeconds) =>
               logger.info("Making request for receiving messages")
@@ -335,7 +335,85 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
       }
     }
 
-  //    override def deleteMessage(): Route = ???
-  //
-  //    override def deleteMultipleMessages(): Route = ???
+  override def deleteMessage(): Route =
+    path("queue" / "deleteMessage") {
+      pathEnd {
+        (delete & entity(as[DeleteMessageRequest])) { deleteMessageRequest =>
+          logger.info("Making request for deleting messages from queue: " + deleteMessageRequest.queueName)
+          messagingServiceImpl.searchQueueByName(deleteMessageRequest.queueName) match {
+            case None =>
+              complete(
+                HttpResponse(
+                  StatusCodes.InternalServerError,
+                  entity = HttpEntity(ContentTypes.`application/json`, QUEUE_NOT_FOUND)
+                )
+              )
+            case Some(queue) =>
+              messagingServiceImpl.deleteMessageFromQueue(
+                queue.url,
+                deleteMessageRequest.receiptHandle
+              ) match {
+                case Left(ex) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(
+                        ContentTypes.`application/json`,
+                        s"Cannot be delete message for the specified queue : ${ex.getMessage}"
+                      )
+                    )
+                  )
+                case Right(_) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.OK,
+                      entity = HttpEntity(ContentTypes.`application/json`, MESSAGE_DELETED)
+                    )
+                  )
+              }
+          }
+        }
+      }
+    }
+
+  override def deleteMultipleMessages(): Route =
+    path("queue" / "deleteMultipleMessages") {
+      pathEnd {
+        (delete & entity(as[DeleteMessagesRequest])) { deleteMessagesRequest =>
+          logger.info("Making request for deleting multiple messages from queue: " + deleteMessagesRequest.queueName)
+          messagingServiceImpl.searchQueueByName(deleteMessagesRequest.queueName) match {
+            case None =>
+              complete(
+                HttpResponse(
+                  StatusCodes.InternalServerError,
+                  entity = HttpEntity(ContentTypes.`application/json`, QUEUE_NOT_FOUND)
+                )
+              )
+            case Some(queue) =>
+              messagingServiceImpl.deleteMultipleMessagesFromQueue(
+                queue.url,
+                deleteMessagesRequest.receiptHandles
+              ) match {
+                case Left(ex) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.InternalServerError,
+                      entity = HttpEntity(
+                        ContentTypes.`application/json`,
+                        s"Cannot be delete multiple messages for the specified queue : ${ex.getMessage}"
+                      )
+                    )
+                  )
+                case Right(_) =>
+                  complete(
+                    HttpResponse(
+                      StatusCodes.OK,
+                      entity = HttpEntity(ContentTypes.`application/json`, MESSAGES_DELETED)
+                    )
+                  )
+              }
+          }
+        }
+      }
+    }
 }
