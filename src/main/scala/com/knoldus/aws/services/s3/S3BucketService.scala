@@ -1,6 +1,6 @@
 package com.knoldus.aws.services.s3
 
-import com.knoldus.s3.models.Bucket
+import com.knoldus.s3.models.{ Bucket, S3ObjectSummary }
 
 trait S3BucketService {
 

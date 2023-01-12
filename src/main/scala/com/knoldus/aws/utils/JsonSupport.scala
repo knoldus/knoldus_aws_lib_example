@@ -28,7 +28,7 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
   implicit val deleteQueueRequestFormat: RootJsonFormat[DeleteQueueRequest] = jsonFormat1(DeleteQueueRequest.apply)
 
-  implicit val ReceiveMessageRequestFormat: RootJsonFormat[ReceiveMessageRequest] = jsonFormat1(
+  implicit val receiveMessageRequestFormat: RootJsonFormat[ReceiveMessageRequest] = jsonFormat1(
     ReceiveMessageRequest.apply
   )
 
@@ -42,15 +42,23 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     SendMessageToFifoRequest.apply
   )
 
+  implicit val s3ObjectResponseFormat: RootJsonFormat[S3ObjectResponse] = jsonFormat7(
+    S3ObjectResponse.apply
+  )
+
   implicit val sendMessageToStandardRequestFormat: RootJsonFormat[SendMessageToStandardRequest] = jsonFormat3(
     SendMessageToStandardRequest.apply
   )
 
-  implicit val DeleteMessageRequestFormat: RootJsonFormat[DeleteMessageRequest] = jsonFormat2(
+  implicit val retrieveObjectSummariesRequestFormat: RootJsonFormat[RetrieveObjectSummariesRequest] = jsonFormat2(
+    RetrieveObjectSummariesRequest.apply
+  )
+
+  implicit val deleteMessageRequestFormat: RootJsonFormat[DeleteMessageRequest] = jsonFormat2(
     DeleteMessageRequest.apply
   )
 
-  implicit val DeleteMessagesRequestFormat: RootJsonFormat[DeleteMessagesRequest] = jsonFormat2(
+  implicit val deleteMessagesRequestFormat: RootJsonFormat[DeleteMessagesRequest] = jsonFormat2(
     DeleteMessagesRequest.apply
   )
 

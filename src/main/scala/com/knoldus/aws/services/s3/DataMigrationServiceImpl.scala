@@ -1,6 +1,6 @@
 package com.knoldus.aws.services.s3
 
-import com.knoldus.s3.models.{ Bucket, DeletedObject, PutObjectResult, S3Object }
+import com.knoldus.s3.models.{ Bucket, DeletedObject, PutObjectResult, S3Object, S3ObjectSummary }
 import com.knoldus.s3.services.S3Service
 
 import java.io.File
@@ -37,4 +37,12 @@ class DataMigrationServiceImpl extends DataMigrationService {
       case Failure(exception) => Left(exception)
       case Success(deletedObject) => Right(deletedObject)
     }
+
+  override def getAllObjects(bucket: Bucket, prefix: String): Either[Throwable, Seq[S3ObjectSummary]] = {
+    val s3ObjectSummaryEither = Try(s3Service.listDirAndObjectWithPrefix(bucket, prefix))
+    s3ObjectSummaryEither match {
+      case Failure(ex) => Left(ex)
+      case Success(value) => Right(value.flatMap(_.toSeq))
+    }
+  }
 }

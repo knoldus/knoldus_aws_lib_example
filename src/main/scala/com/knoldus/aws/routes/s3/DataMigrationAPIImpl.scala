@@ -1,22 +1,22 @@
 package com.knoldus.aws.routes.s3
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Directives.{ entity, _ }
 import akka.http.scaladsl.server.directives.FileInfo
 import akka.http.scaladsl.server.{ ExceptionHandler, Route }
-import akka.util.ByteString
 import com.knoldus.aws.bootstrap.DriverApp.actorSystem
-import com.knoldus.aws.models.s3.{ CopyObjectRequest, ObjectDeletionRequest, RetrieveObjectRequest }
-import com.knoldus.aws.services.s3.DataMigrationServiceImpl
-import com.knoldus.aws.utils.Constants.OBJECT_UPLOADED
+import com.knoldus.aws.models.s3._
+import com.knoldus.aws.services.s3.{ DataMigrationServiceImpl, S3BucketServiceImpl }
+import com.knoldus.aws.utils.Constants.{ BUCKET_NOT_FOUND, OBJECT_UPLOADED }
 import com.knoldus.aws.utils.JsonSupport
 import com.knoldus.s3.models.Bucket
 import com.typesafe.scalalogging.LazyLogging
+import spray.json.enrichAny
 
 import java.io.File
 import java.util.UUID
 
-class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
+class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl, s3BucketServiceImpl: S3BucketServiceImpl)
     extends DataMigrationAPI
     with JsonSupport
     with LazyLogging {
@@ -153,4 +153,56 @@ class DataMigrationAPIImpl(dataMigrationServiceImpl: DataMigrationServiceImpl)
         }
       }
     }
+
+  override def getAllObjects: Route =
+    path("bucket" / "getAllObjects") {
+      pathEnd {
+        (get & entity(as[RetrieveObjectSummariesRequest])) { retrieveObjectSummaries =>
+          handleExceptions(noSuchElementExceptionHandler) {
+            logger.info(s"Making request for getting all the objects in the S3 bucket")
+            s3BucketServiceImpl.searchS3Bucket(retrieveObjectSummaries.bucketName) match {
+              case None =>
+                complete(
+                  HttpResponse(
+                    StatusCodes.NotFound,
+                    entity = HttpEntity(ContentTypes.`application/json`, BUCKET_NOT_FOUND)
+                  )
+                )
+              case Some(bucket) =>
+                dataMigrationServiceImpl.getAllObjects(bucket, retrieveObjectSummaries.prefix) match {
+                  case Left(ex) =>
+                    complete(
+                      HttpResponse(
+                        StatusCodes.InternalServerError,
+                        entity = HttpEntity(
+                          ContentTypes.`application/json`,
+                          s"Exception: ${ex.getMessage}"
+                        )
+                      )
+                    )
+                  case Right(objSummaries) =>
+                    val objResponse = objSummaries.map { obj =>
+                      S3ObjectResponse(
+                        obj.bucket.name,
+                        obj.getKey,
+                        obj.getSize,
+                        obj.getStorageClass,
+                        obj.getETag,
+                        obj.getLastModified.toString,
+                        obj.getOwner.toString
+                      )
+                    }
+                    complete(
+                      HttpResponse(
+                        StatusCodes.OK,
+                        entity = HttpEntity(ContentTypes.`application/json`, objResponse.toJson.prettyPrint)
+                      )
+                    )
+                }
+            }
+          }
+        }
+      }
+    }
+
 }

@@ -1,6 +1,6 @@
 package com.knoldus.aws.services.s3
 
-import com.knoldus.s3.models.{ Bucket, DeletedObject, PutObjectResult, S3Object }
+import com.knoldus.s3.models.{ Bucket, DeletedObject, PutObjectResult, S3Object, S3ObjectSummary }
 
 import java.io.File
 
@@ -18,4 +18,7 @@ trait DataMigrationService {
   ): Either[Throwable, PutObjectResult]
 
   def deleteFile(key: String)(implicit bucket: Bucket): Either[Throwable, DeletedObject]
+
+  def getAllObjects(bucket: Bucket, prefix: String): Either[Throwable, Seq[S3ObjectSummary]]
+
 }

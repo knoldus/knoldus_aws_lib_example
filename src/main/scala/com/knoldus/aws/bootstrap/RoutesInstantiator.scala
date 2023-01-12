@@ -19,7 +19,7 @@ class RoutesInstantiator(
     new S3BucketAPIImpl(services.s3BucketService)
 
   private val dataMigrationAPIImplRoutes: DataMigrationAPIImpl =
-    new DataMigrationAPIImpl(services.dataMigrationServiceImpl)
+    new DataMigrationAPIImpl(services.dataMigrationServiceImpl, services.s3BucketService)
 
   private val messagingAPIImplRoutes: MessagingAPIImpl =
     new MessagingAPIImpl(services.messagingService)

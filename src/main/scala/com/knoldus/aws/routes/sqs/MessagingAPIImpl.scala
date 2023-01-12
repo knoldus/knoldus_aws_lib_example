@@ -34,7 +34,7 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
             case Left(ex) =>
               complete(
                 HttpResponse(
-                  StatusCodes.InternalServerError,
+                  StatusCodes.BadRequest,
                   entity = HttpEntity(ContentTypes.`application/json`, s"Exception ${ex.getMessage}")
                 )
               )
