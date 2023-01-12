@@ -1,8 +1,8 @@
 package com.knoldus.aws.routes.sqs
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.{ ContentTypes, HttpEntity, HttpResponse, StatusCodes }
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ExceptionHandler, Route}
+import akka.http.scaladsl.server.{ ExceptionHandler, Route }
 import com.knoldus.aws.models.sqs._
 import com.knoldus.aws.services.sqs.MessagingServiceImpl
 import com.knoldus.aws.utils.Constants._
@@ -17,8 +17,7 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
 
   val routes: Route =
     createQueue ~ listQueues ~ deleteQueue() ~ sendMsgToFIFOQueue ~ sendMsgToStandardQueue ~
-        sendMultipleMsgToFIFOQueue ~ sendMultipleMsgToStandardQueue ~ receiveMessage
-  //~ deleteMessage() ~ deleteMultipleMessages()
+        sendMultipleMsgToFIFOQueue ~ sendMultipleMsgToStandardQueue ~ receiveMessage ~ deleteMessage() ~ deleteMultipleMessages()
 
   implicit val noSuchElementExceptionHandler: ExceptionHandler = ExceptionHandler {
     case e: NoSuchElementException =>
