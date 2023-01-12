@@ -44,6 +44,14 @@ trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     SendMessageToStandardRequest.apply
   )
 
+  implicit val DeleteMessageRequestFormat: RootJsonFormat[DeleteMessageRequest] = jsonFormat2(
+    DeleteMessageRequest.apply
+  )
+
+  implicit val DeleteMessagesRequestFormat: RootJsonFormat[DeleteMessagesRequest] = jsonFormat2(
+    DeleteMessagesRequest.apply
+  )
+
   implicit val sendMessagesToFifoRequestFormat: RootJsonFormat[SendMessagesToFifoRequest] = jsonFormat5(
     SendMessagesToFifoRequest.apply
   )

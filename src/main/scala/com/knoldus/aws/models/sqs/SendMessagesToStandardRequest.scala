@@ -2,7 +2,7 @@ package com.knoldus.aws.models.sqs
 
 import play.api.libs.json.{ Format, JsSuccess, JsValue, Json }
 
-case class SendMessagesToStandardRequest(queueName: String, messageBody: Seq[String], delaySeconds: Option[Int])
+case class SendMessagesToStandardRequest(queueName: String, messageBodies: Seq[String], delaySeconds: Option[Int])
 
 object SendMessagesToStandardRequest {
 

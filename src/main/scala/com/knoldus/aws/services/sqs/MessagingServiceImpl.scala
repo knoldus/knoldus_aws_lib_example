@@ -2,10 +2,11 @@ package com.knoldus.aws.services.sqs
 
 import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.services.sqs.AmazonSQS
+import com.amazonaws.services.sqs.model.{ DeleteMessageResult, QueueNameExistsException }
 import com.knoldus.aws.utils.Constants._
 import com.knoldus.common.aws.CredentialsLookup
 import com.knoldus.sqs.models.QueueType.QueueType
-import com.knoldus.sqs.models.{ Message, Queue, SQSConfig }
+import com.knoldus.sqs.models.{ Message, Queue, QueueType, SQSConfig }
 import com.knoldus.sqs.services.SQSService
 import com.knoldus.sqs.services.SQSService.buildAmazonSQSClient
 
@@ -90,5 +91,20 @@ class MessagingServiceImpl(sqsConfig: SQSConfig) extends MessagingService {
     Try(sqsService.receiveMessages(queue, maxNumberOfMessages, waitForSeconds)) match {
       case Failure(exception) => Left(exception)
       case Success(value) => Right(value)
+    }
+
+  override def deleteMessageFromQueue(queueUrl: String, receiptHandle: String): Either[Throwable, String] =
+    Try(sqsService.deleteMessage(queueUrl, receiptHandle)) match {
+      case Failure(exception) => Left(exception)
+      case Success(_) => Right(MESSAGE_DELETED)
+    }
+
+  override def deleteMultipleMessagesFromQueue(
+    queueUrl: String,
+    receiptHandle: Seq[String]
+  ): Either[Throwable, String] =
+    Try(sqsService.deleteMessages(queueUrl, receiptHandle)) match {
+      case Failure(exception) => Left(exception)
+      case Success(_) => Right(MESSAGES_DELETED)
     }
 }
