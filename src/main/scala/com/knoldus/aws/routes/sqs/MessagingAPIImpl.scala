@@ -60,8 +60,7 @@ class MessagingAPIImpl(messagingServiceImpl: MessagingServiceImpl)
             if (queueSeq.isEmpty)
               complete(
                 HttpResponse(
-                  StatusCodes.NoContent,
-                  entity = HttpEntity(ContentTypes.`application/json`, NO_QUEUES_FOUND)
+                  StatusCodes.NoContent
                 )
               )
             else

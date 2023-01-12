@@ -1,7 +1,8 @@
 package com.knoldus.aws.services.s3
 
-import com.amazonaws.auth.AWSCredentialsProvider
-import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.auth.{ AWSCredentialsProvider, DefaultAWSCredentialsProviderChain }
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
+import com.amazonaws.services.s3.{ AmazonS3, AmazonS3ClientBuilder }
 import com.knoldus.aws.utils.Constants.BUCKET_DELETED
 import com.knoldus.common.aws.CredentialsLookup
 import com.knoldus.s3.models.{ Bucket, Configuration }
@@ -15,21 +16,22 @@ class S3BucketServiceImpl(s3config: Configuration) extends S3BucketService {
   implicit val s3Service: S3Service = new S3Service {
     override val config: Configuration = s3config
 
-    override val amazonS3Client: AmazonS3 = {
-      val credentials: AWSCredentialsProvider =
-        CredentialsLookup.getCredentialsProvider(s3config.awsConfig.awsAccessKey, s3config.awsConfig.awsSecretKey)
-      buildAmazonS3Client(s3config, credentials)
-    }
+    override val amazonS3Client: AmazonS3 = AmazonS3ClientBuilder
+      .standard()
+      .withEndpointConfiguration(
+        new EndpointConfiguration(s3config.s3Config.serviceEndpoint, s3config.awsConfig.awsRegion)
+      )
+      .withCredentials(new DefaultAWSCredentialsProviderChain())
+      .withPathStyleAccessEnabled(true)
+      .build()
   }
 
   override def createS3Bucket(bucketName: String): Either[Throwable, Bucket] =
-    Try(
-      s3Service
-        .getBucketByName(bucketName)
-        .getOrElse(s3Service.createBucket(bucketName, Some(s3config.awsConfig.awsRegion)))
-    ) match {
-      case Failure(ex) => Left(ex)
-      case Success(bucket) => Right(bucket)
+    Try(s3Service.createBucket(bucketName, Some(s3Service.config.awsConfig.awsRegion))) match {
+      case Failure(ex) =>
+        Left(ex)
+      case Success(bucket) =>
+        Right(bucket)
     }
 
   override def deleteS3Bucket(bucket: Bucket): Either[Throwable, String] =
